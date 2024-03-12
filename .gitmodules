@@ -1,3 +1,6 @@
 [submodule "rtl/vendor/pulp-platform/axi_mem_if"]
 	path = rtl/vendor/pulp-platform/axi_mem_if
 	url = https://github.com/pulp-platform/axi_mem_if.git
+[submodule "rtl/vendor/pulp-platform/common_cells"]
+	path = rtl/vendor/pulp-platform/common_cells
+	url = https://github.com/pulp-platform/common_cells.git
