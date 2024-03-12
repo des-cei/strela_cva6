@@ -1,4 +1,4 @@
-export VERILATOR_ROOT= /home/juangranja/Documents/verilator-5.018
+export VERILATOR_ROOT= /home/juangranja/Documents/verilator-5.020
 
 VERILATOR= $(VERILATOR_ROOT)/bin/verilator
 
@@ -60,7 +60,7 @@ waveform.vcd: .stamp.verilate # Because we verilate and build at once.
 
 .PHONY:waves
 waves: waveform.vcd
-	gtkwave waveform.vcd gtkwave_waveform_setup.gtkw --rcvar 'fontname_signals Monospace 12' --rcvar 'fontname_waves Monospace 10' 
+	gtkwave waveform.vcd gtkwave_config/gtkwave_waveform_setup.gtkw --rcvar 'fontname_signals Monospace 12' --rcvar 'fontname_waves Monospace 10' 
 
 .PHONY:lint
 lint: $(verilator_srcs)

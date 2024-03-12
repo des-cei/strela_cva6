@@ -11,7 +11,7 @@ module cgra_axi_master #(
 ) (
     input   logic       clk_i,
     input   logic       rst_ni,
-    AXI_BUS.Master      axi_master_port  
+    AXI_BUS.Master      axi_master_port
 );
     // Default values. See "Table A10-1 Master interface write channel signals and default signal values"
 
@@ -44,7 +44,7 @@ module cgra_axi_master #(
     // assign axi_master_port.b_resp;           // Input
     // assign axi_master_port.b_user;           // Input
     // assign axi_master_port.b_valid;          // Input
-    // assign axi_master_port.b_ready;
+    assign axi_master_port.b_ready = 1'b1;      // No error checking
  
     // // AXI read address channel
     assign axi_master_port.ar_id = '0;
@@ -68,33 +68,189 @@ module cgra_axi_master #(
     // assign axi_master_port.r_last;   // Input
     // assign axi_master_port.r_user;   // Input
     // assign axi_master_port.r_valid;  // Input
-    // assign axi_master_port.r_ready;  
+    // assign axi_master_port.r_ready; 
+
+    enum logic [1:0] {
+    S_IDLE = 2'b00,
+    S_ADDR = 2'b01,
+    S_DONE = 2'b10
+    } state_d, state_q;
+
+
+    
+
+
+    // Simulated inputs
+    logic execute_i;
+    logic [31:0] input_addr_i;
+    logic [15:0] input_size_i;
+    logic [15:0] input_stride_i;
+
+    logic [15:0] addr_offset_d, addr_offset_q;
 
     initial begin
-        
-        @(posedge rst_ni);
-        
-        @(negedge clk_i); // Negedge because verilator does not handle posedge correctly.
-        axi_master_port.ar_addr <= 64'h00000001;
-        axi_master_port.ar_valid <= 1'b1;
+        input_addr_i = '0;
+        input_stride_i = 4;
+        input_size_i = 16;
+        execute_i = 0;
 
-        // Wait for ar_valid on clock edge
-        @(negedge clk_i);// iff (axi_master_port.ar_ready == 1'b1));
-        axi_master_port.ar_valid <= 1'b0;
+        @(posedge rst_ni);
 
         @(negedge clk_i);
-        axi_master_port.r_ready <= 1'b1;
+        @(negedge clk_i);
+        execute_i = 1;
 
-        // Wait for ar_valid on clock edge
-        //@(negedge clk_i iff  (axi_master_port.r_valid == 1'b1));
-        axi_master_port.r_ready <= 1'b0;
-        
-        @(posedge clk_i);
-        @(posedge clk_i);
-        //assign axi_master_port.r_ready = 1'b1;
+        repeat(20) @(posedge clk_i);
+
         $finish;
 
+
+
     end
+
+    // TEST
+    assign axi_master_port.r_ready = 1'b1;
+
+    
+    /**********************************
+    *           Read data
+    **********************************/
+
+    // always_ff @(posedge clk_i or negedge rst_ni) begin
+    //     if(~rst_ni) begin
+    //         // addr_offset_q <= '0;
+    //         // state_q <= S_IDLE;
+    //     end else begin
+    //         // addr_offset_q <= addr_offset_d;
+    //         // state_q <= state_d;
+    //     end
+    // end
+
+    // always_comb begin
+    //     // Defaults
+
+
+    //     unique case (state_q)
+    //         S_IDLE: begin
+                
+    //         end
+
+    //         S_ADDR: begin
+
+    //         end
+
+    //     endcase
+
+    // end
+
+    
+     // // Configured by default for 32 bit word, depth 8.
+    // fifo_v3 fifo_i
+    // (
+    // .clk_i        ( clk_i                 ),
+    // .rst_ni       ( rst_ni                ),
+    // .flush_i      ( 1'b0                  ),
+    // .testmode_i   ( 1'b0                  ),
+    // .usage_o      ( data_count            ),
+    // .data_i       ( masters_resp_i.rdata  ),
+    // .push_i       ( masters_resp_i.rvalid ),
+    // .full_o       ( full                  ),
+    // .data_o       ( dout_o                ),
+    // .pop_i        ( re                    ),
+    // .empty_o      ( empty                 )
+    // );
+
+    
+
+    
+
+    /**********************************
+    *           Read address
+    **********************************/
+
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if(~rst_ni) begin
+            addr_offset_q <= '0;
+            state_q <= S_IDLE;
+        end else begin
+            addr_offset_q <= addr_offset_d;
+            state_q <= state_d;
+        end
+    end
+
+    // Read address
+    assign axi_master_port.ar_addr = input_addr_i + addr_offset_q;
+
+    always_comb begin
+        // Defaults
+        addr_offset_d = addr_offset_q;
+        axi_master_port.ar_valid = 1'b0;
+
+        unique case (state_q)
+            S_IDLE: begin
+                addr_offset_d = 0;
+
+                if(execute_i & input_size_i != 0)
+                    state_d = S_ADDR;
+                else
+                    state_d = S_IDLE;
+            end
+
+            S_ADDR: begin
+                // If ready keep sending addresses until done.
+                axi_master_port.ar_valid = 1'b1;
+
+                if(axi_master_port.ar_ready)
+                    addr_offset_d = addr_offset_q + input_stride_i;
+                
+                if(addr_offset_d >= input_size_i)
+                    state_d = S_IDLE;
+                else
+                    state_d = S_ADDR;
+            end
+
+        endcase
+
+    end
+
+
+
+
+   
+
+
+
+    // initial begin
+        
+    //     state = S_ADDR;
+
+    //     @(posedge rst_ni);
+        
+    //     @(negedge clk_i); // Negedge because verilator does not handle posedge correctly.
+    //     axi_master_port.ar_addr <= 64'h00000001;
+    //     axi_master_port.ar_valid <= 1'b1;
+
+    //     // Wait for ar_valid on clock edge
+    //     @(negedge clk_i);// iff (axi_master_port.ar_ready == 1'b1));
+    //     axi_master_port.ar_valid <= 1'b0;
+
+    //     @(negedge clk_i);
+    //     axi_master_port.r_ready <= 1'b1;
+
+    //     // Wait for ar_valid on clock edge
+    //     //@(negedge clk_i iff  (axi_master_port.r_valid == 1'b1));
+    //     axi_master_port.r_ready <= 1'b0;
+        
+    //     @(posedge clk_i);
+    //     @(posedge clk_i);
+    //     //assign axi_master_port.r_ready = 1'b1;
+    //     $finish;
+
+    // end
+
+
+
+
 
     
 
