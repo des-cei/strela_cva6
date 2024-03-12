@@ -1,0 +1,1 @@
+Simulation setup for development of AXI interface for Strela CGRA.
