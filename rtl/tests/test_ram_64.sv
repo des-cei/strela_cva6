@@ -22,13 +22,14 @@ module test_ram_64 (
    output logic [63:0]  rdata_o,
    input  logic [63:0]  wdata_i
 );
-    localparam int RamSize = 4;
+    localparam int RamSize = 5;
 
     logic [RamSize-1:0][63:0] mem = {
-        64'h303000ef_01a11113,
-        64'h0210011b_03249663,
-        64'hf1402973_00000493,
-        64'h30491073_00800913
+        64'ha4444444_b4444444,
+        64'ha3333333_b3333333,
+        64'ha2222222_b2222222,
+        64'ha1111111_b1111111,
+        64'ha0000000_b0000000
     };
 
     logic [$clog2(RamSize)-1:0] addr_q;
