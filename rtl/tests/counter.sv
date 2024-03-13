@@ -34,9 +34,9 @@ module counter(
         //@(posedge rst_ni);
 
         @(negedge clk_i);
-        repeat(20) @(negedge clk_i);
+        repeat(100) @(negedge clk_i);
 
-        //$finish;
+        $finish;
 
         // repeat(1) @(negedge clk_i);
         // ram_req = 1'b1;
@@ -56,17 +56,28 @@ module counter(
 
     end
 
-    cgra_axi_master #(
+    // cgra_axi_master #(
+    //     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
+    //     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
+    //     .AXI_DATA_WIDTH ( AxiDataWidth     ),
+    //     .AXI_USER_WIDTH ( AxiUserWidth     )
+    // ) cgra_axi_master_i (
+    //     .clk_i  (clk_i),
+    //     .rst_ni (rst_ni),
+    //     .axi_master_port (axi_bus_interface)
+    // );
+    
+
+    axi_master_test #(
         .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
         .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
         .AXI_DATA_WIDTH ( AxiDataWidth     ),
         .AXI_USER_WIDTH ( AxiUserWidth     )
-    ) cgra_axi_master_i (
+    ) axi_master_test_i (
         .clk_i  (clk_i),
         .rst_ni (rst_ni),
         .axi_master_port (axi_bus_interface)
     );
-    
 
   
 

@@ -17,8 +17,9 @@ verilator_inc_dirs = $(axi_src_dir)/../include/
 
 # rtl/tests/test_tb.sv
 
-verilator_srcs = rtl/tests/counter.sv rtl/tests/test_ram_64.sv \
-			     rtl/tests/axi_master.sv
+verilator_srcs =  rtl/tests/counter.sv rtl/tests/test_ram_64.sv
+#verilator_srcs += rtl/tests/axi_master.sv
+verilator_srcs += rtl/tests/axi_master_test.sv
 				 
 verilator_srcs += $(axi_src_dir)/axi_pkg.sv $(axi_src_dir)/axi_intf.sv
 verilator_srcs += rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv \
