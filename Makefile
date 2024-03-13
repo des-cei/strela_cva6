@@ -19,8 +19,10 @@ verilator_inc_dirs = $(axi_src_dir)/../include/
 
 verilator_srcs = rtl/tests/counter.sv rtl/tests/test_ram_64.sv \
 			     rtl/tests/axi_master.sv
+				 
 verilator_srcs += $(axi_src_dir)/axi_pkg.sv $(axi_src_dir)/axi_intf.sv
-verilator_srcs += rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv
+verilator_srcs += rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv \
+					rtl/vendor/pulp-platform/common_cells/src/fifo_v3.sv
 
 verilator_cpp_testbench = rtl/tests/counter_tb.cpp
 
@@ -60,7 +62,7 @@ waveform.vcd: .stamp.verilate # Because we verilate and build at once.
 
 .PHONY:waves
 waves: waveform.vcd
-	gtkwave waveform.vcd gtkwave_config/gtkwave_waveform_setup.gtkw --rcvar 'fontname_signals Monospace 12' --rcvar 'fontname_waves Monospace 10' 
+	gtkwave waveform.vcd gtkwave_config/gtkwave_waveform_setup.gtkw --rcvar 'fontname_signals Monospace 10' --rcvar 'fontname_waves Monospace 10' 
 
 .PHONY:lint
 lint: $(verilator_srcs)

@@ -70,16 +70,21 @@ module cgra_axi_master #(
     // assign axi_master_port.r_valid;  // Input
     // assign axi_master_port.r_ready; 
 
-    enum logic [1:0] {
-    S_IDLE = 2'b00,
-    S_ADDR = 2'b01,
-    S_DONE = 2'b10
-    } state_d, state_q;
+    enum logic [1:0]
+    {
+        S_IDLE = 2'b00,
+        S_ADDR = 2'b01
+    } state_ra_d, state_ra_q;
 
+    typedef struct packed
+    {
+        logic [1:0] input_pe_idx;
+        logic odd_not_even_word;
+    } input_trans_info_t;
 
+    localparam MAX_OUTSTANDING = 4;
+    localparam INPUT_FIFO_DEPTH = 8;
     
-
-
     // Simulated inputs
     logic execute_i;
     logic [31:0] input_addr_i;
@@ -88,10 +93,65 @@ module cgra_axi_master #(
 
     logic [15:0] addr_offset_d, addr_offset_q;
 
+    // Read outstanding FIFO
+    input_trans_info_t input_outst_fifo_in;
+    input_trans_info_t input_outst_fifo_out;
+
+    logic input_outst_fifo_push;
+    logic input_outst_fifo_pop;
+
+    logic input_outst_fifo_empty;
+    logic input_outst_fifo_full;
+
+    // Input data FIFO
+
+    logic [31:0] input_data_fifo_in;
+    logic [31:0] input_data_fifo_out;
+
+    logic input_data_fifo_push;
+    logic input_data_fifo_pop;
+
+    logic input_data_fifo_empty;
+    logic input_data_fifo_full;
+
+    logic [3:0] input_data_fifo_count;
+
+    logic input_data_fifo_pop_enable;
+
+    //logic input_data_fifo_
+
+
+
     initial begin
+
+        // Test FIFO
+
+        // @(posedge rst_ni);
+        // @(negedge clk_i);
+        // test_fifo_push = 1'b0;
+        // test_fifo_push = 1'b0;
+        
+
+        // @(negedge clk_i);
+
+        // test_fifo_push = 1'b1;
+        // test_fifo_input = '{input_pe_idx: 1, odd_not_even_word: 1'b1};
+
+        // @(negedge clk_i);
+
+        // test_fifo_push = 1'b1;
+        // test_fifo_input = '{input_pe_idx: 2, odd_not_even_word: 1'b0};
+
+        // @(negedge clk_i);
+        // @(negedge clk_i);
+        // test_fifo_pop = 1'b1;
+        
+
+
+        // Test generate address
         input_addr_i = '0;
-        input_stride_i = 4;
-        input_size_i = 16;
+        input_stride_i = 16;
+        input_size_i = 100;
         execute_i = 0;
 
         @(posedge rst_ni);
@@ -99,6 +159,10 @@ module cgra_axi_master #(
         @(negedge clk_i);
         @(negedge clk_i);
         execute_i = 1;
+
+        repeat(15) @(posedge clk_i);
+
+        input_data_fifo_pop_enable = 1'b1;
 
         repeat(20) @(posedge clk_i);
 
@@ -108,105 +172,126 @@ module cgra_axi_master #(
 
     end
 
+    assign input_data_fifo_pop = !input_data_fifo_empty & input_data_fifo_pop_enable;
+
+
     // TEST
     assign axi_master_port.r_ready = 1'b1;
 
+    // Outstanding fifo
+    fifo_v3 #(
+        .DEPTH(MAX_OUTSTANDING),
+        .dtype(input_trans_info_t)
+    ) input_trans_outstanding_fifo (
+        .clk_i        ( clk_i                   ),
+        .rst_ni       ( rst_ni                  ),
+        .flush_i      ( 1'b0                    ),
+        .testmode_i   ( 1'b0                    ),
+        .usage_o      (                         ),
+        .data_i       ( input_outst_fifo_in     ),
+        .push_i       ( input_outst_fifo_push   ),
+        .full_o       ( input_outst_fifo_full   ),
+        .data_o       ( input_outst_fifo_out    ),
+        .pop_i        ( input_outst_fifo_pop    ),
+        .empty_o      ( input_outst_fifo_empty  )
+    );
     
     /**********************************
     *           Read data
     **********************************/
-
-    // always_ff @(posedge clk_i or negedge rst_ni) begin
-    //     if(~rst_ni) begin
-    //         // addr_offset_q <= '0;
-    //         // state_q <= S_IDLE;
-    //     end else begin
-    //         // addr_offset_q <= addr_offset_d;
-    //         // state_q <= state_d;
-    //     end
-    // end
-
-    // always_comb begin
-    //     // Defaults
-
-
-    //     unique case (state_q)
-    //         S_IDLE: begin
-                
-    //         end
-
-    //         S_ADDR: begin
-
-    //         end
-
-    //     endcase
-
-    // end
-
     
-     // // Configured by default for 32 bit word, depth 8.
-    // fifo_v3 fifo_i
-    // (
-    // .clk_i        ( clk_i                 ),
-    // .rst_ni       ( rst_ni                ),
-    // .flush_i      ( 1'b0                  ),
-    // .testmode_i   ( 1'b0                  ),
-    // .usage_o      ( data_count            ),
-    // .data_i       ( masters_resp_i.rdata  ),
-    // .push_i       ( masters_resp_i.rvalid ),
-    // .full_o       ( full                  ),
-    // .data_o       ( dout_o                ),
-    // .pop_i        ( re                    ),
-    // .empty_o      ( empty                 )
-    // );
+    // axi_master_port.r_data
 
-    
 
-    
+    fifo_v3 #(
+        .DEPTH(INPUT_FIFO_DEPTH),
+        .dtype(logic [31:0])
+    ) input_data_fifo (
+        .clk_i        ( clk_i                   ),
+        .rst_ni       ( rst_ni                  ),
+        .flush_i      ( 1'b0                    ),
+        .testmode_i   ( 1'b0                    ),
+        .usage_o      ( input_data_fifo_count   ),
+        .data_i       ( input_data_fifo_in      ),
+        .push_i       ( input_data_fifo_push    ),
+        .full_o       ( input_data_fifo_full    ),
+        .data_o       ( input_data_fifo_out     ),
+        .pop_i        ( input_data_fifo_pop     ),
+        .empty_o      ( input_data_fifo_empty   ) 
+    );
+
+
+    always_comb begin
+
+        // Write incomming data into input data FIFO, extract transaction
+        // from outstanding FIFO.
+        axi_master_port.r_ready = !input_data_fifo_full;
+
+        input_data_fifo_push = axi_master_port.r_valid && axi_master_port.r_ready;
+        input_outst_fifo_pop = input_data_fifo_push;
+
+        if(input_outst_fifo_out.odd_not_even_word)
+            input_data_fifo_in = axi_master_port.r_data[63:32];
+        else
+            input_data_fifo_in = axi_master_port.r_data[31:00];
+
+    end
+
 
     /**********************************
     *           Read address
     **********************************/
 
-    always_ff @(posedge clk_i or negedge rst_ni) begin
+    always_ff @(posedge clk_i) begin
         if(~rst_ni) begin
             addr_offset_q <= '0;
-            state_q <= S_IDLE;
+            state_ra_q <= S_IDLE;
         end else begin
             addr_offset_q <= addr_offset_d;
-            state_q <= state_d;
+            state_ra_q <= state_ra_d;
         end
     end
 
-    // Read address
-    assign axi_master_port.ar_addr = input_addr_i + addr_offset_q;
+    
 
     always_comb begin
+        // Read address
+        axi_master_port.ar_addr = input_addr_i + addr_offset_q;
+
         // Defaults
         addr_offset_d = addr_offset_q;
         axi_master_port.ar_valid = 1'b0;
 
-        unique case (state_q)
+        // Outstanding FIFO
+        input_outst_fifo_push = 1'b0;
+        input_outst_fifo_in.input_pe_idx = '0; // TEST
+        input_outst_fifo_in.odd_not_even_word = axi_master_port.ar_addr[2]; // Even or odd 32 bit word for 64 bit access.
+
+        unique case (state_ra_q)
             S_IDLE: begin
                 addr_offset_d = 0;
 
                 if(execute_i & input_size_i != 0)
-                    state_d = S_ADDR;
+                    state_ra_d = S_ADDR;
                 else
-                    state_d = S_IDLE;
+                    state_ra_d = S_IDLE;
             end
 
             S_ADDR: begin
                 // If ready keep sending addresses until done.
-                axi_master_port.ar_valid = 1'b1;
 
-                if(axi_master_port.ar_ready)
-                    addr_offset_d = addr_offset_q + input_stride_i;
+                axi_master_port.ar_valid = !input_outst_fifo_full &&
+                                        (input_data_fifo_count < (INPUT_FIFO_DEPTH - MAX_OUTSTANDING)); // Send address if below outstanding limit
+
+                if(axi_master_port.ar_ready && axi_master_port.ar_valid) begin
+                    addr_offset_d = addr_offset_q + input_stride_i; // Increment adress
+                    input_outst_fifo_push = 1'b1;                   // Save transaction in oustanding FIFO
+                end
                 
                 if(addr_offset_d >= input_size_i)
-                    state_d = S_IDLE;
+                    state_ra_d = S_IDLE;
                 else
-                    state_d = S_ADDR;
+                    state_ra_d = S_ADDR;
             end
 
         endcase

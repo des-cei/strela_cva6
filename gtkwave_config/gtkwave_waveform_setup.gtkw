@@ -1,20 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Mar 12 11:57:24 2024
+[*] Wed Mar 13 10:24:08 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/AXI_Tests/waveform.vcd"
-[dumpfile_mtime] "Tue Mar 12 11:57:15 2024"
-[dumpfile_size] 23364
+[dumpfile_mtime] "Wed Mar 13 10:22:11 2024"
+[dumpfile_size] 45058
 [savefile] "/home/juangranja/Documents/AXI_Tests/gtkwave_config/gtkwave_waveform_setup.gtkw"
-[timestart] 0
+[timestart] 4
 [size] 1850 1016
 [pos] 70 27
-*-2.974829 34 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-2.974829 13 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.counter.
 [treeopen] TOP.counter.cgra_axi_master_i.
 [sst_width] 233
-[signals_width] 404
+[signals_width] 297
 [sst_expanded] 1
 [sst_vpaned_height] 289
 @28
@@ -30,7 +30,7 @@ TOP.counter.i_test_ram.wdata_i[63:0]
 TOP.counter.i_test_ram.we_i
 @800200
 -AXI_AR
-@25
+@24
 TOP.counter.axi_bus_interface.ar_addr[63:0]
 @28
 TOP.counter.axi_bus_interface.ar_burst[1:0]
@@ -161,8 +161,20 @@ TOP.counter.axi_bus_interface.b_valid
 TOP.counter.axi_bus_interface.b_ready
 @1401200
 -AXI_B
-@2028
-^1 /home/juangranja/Documents/AXI_Tests/gtkwave_config/translate_axi_state_1.gtkw
-TOP.counter.cgra_axi_master_i.state_q[1:0]
+@28
+TOP.counter.cgra_axi_master_i.clk_i
+TOP.counter.cgra_axi_master_i.input_outst_fifo_full
+TOP.counter.cgra_axi_master_i.input_outst_fifo_push
+TOP.counter.cgra_axi_master_i.input_outst_fifo_in[2:0]
+TOP.counter.cgra_axi_master_i.input_outst_fifo_pop
+TOP.counter.cgra_axi_master_i.input_outst_fifo_out[2:0]
+TOP.counter.cgra_axi_master_i.input_trans_outstanding_fifo.usage_o[1:0]
+@200
+-
+@22
+TOP.counter.cgra_axi_master_i.input_data_fifo_count[3:0]
+TOP.counter.cgra_axi_master_i.input_data_fifo_in[31:0]
+@29
+TOP.counter.cgra_axi_master_i.input_data_fifo_pop
 [pattern_trace] 1
 [pattern_trace] 0
