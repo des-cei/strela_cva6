@@ -2,8 +2,8 @@
 #include <iostream>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
-#include "Vcounter.h"
-#include "Vcounter___024root.h"
+#include "Vsim_top.h"
+#include "Vsim_top___024root.h"
 
 vluint64_t sim_time = 0;
 
@@ -11,7 +11,7 @@ int main(int argc, char** argv, char** env) {
 
     const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
 
-    Vcounter *dut = new Vcounter;
+    Vsim_top *dut = new Vsim_top;
 
     Verilated::traceEverOn(true);
     VerilatedVcdC *m_trace = new VerilatedVcdC;

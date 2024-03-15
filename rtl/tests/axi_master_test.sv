@@ -75,50 +75,62 @@ module axi_master_test #(
 
     // Write same data always
     assign axi_master_port.w_data = 64'hdead_beef_1234_5678;
-    assign axi_master_port.w_valid = 1'b1;
-
+    assign axi_master_port.w_valid = 1'b1; 
+ 
     logic [63:0] write_address_d, write_address_q;
     localparam start_address = 32'h9000_0000;
     localparam end_address   = 32'h9000_0100;
-    // localparam start_address = 32'h0000_0008;
+    // localparam start_address = 32'h0000_0000;
     // localparam end_address   = 32'h0000_0032;
 
-    logic [9:0] timer_q, timer_d;
+    logic [3:0] timer_q, timer_d;
 
     assign axi_master_port.aw_addr = write_address_q;
+
 
     always_ff @(posedge clk_i) begin
         if(!rst_ni) begin
             write_address_q <= start_address;
-            timer_q <= 2;
         end else begin
-            timer_q <= timer_d;
-            write_address_q <= write_address_d;
+            timer_q <= timer_d + 1;
+            axi_master_port.w_valid <= 1'b1;
+            axi_master_port.aw_valid <= 1'b1;
         end
-
     end
 
-    always_comb begin
-        // Defaults
-        axi_master_port.aw_valid = 1'b0;
-        timer_d = timer_q + 1;
-        write_address_d = write_address_q;
+
+    // always_ff @(posedge clk_i) begin
+    //     if(!rst_ni) begin
+    //         write_address_q <= start_address;
+    //         timer_q <= 10;
+    //     end else begin
+    //         timer_q <= timer_d;
+    //         write_address_q <= write_address_d;
+    //     end
+
+    // end
+
+    // always_comb begin
+    //     // Defaults
+    //     axi_master_port.aw_valid = 1'b0;
+    //     timer_d = timer_q + 1;
+    //     write_address_d = write_address_q;
         
 
-        if (timer_q == 0) begin
-            // Wait for transaction
-            axi_master_port.aw_valid = 1'b1;
-            if(!axi_master_port.aw_ready) // Wait for ready
-                timer_d = timer_q;
+    //     if (timer_q < 5 ) begin
+    //         // Wait for transaction
+    //         axi_master_port.aw_valid = 1'b1;
+    //         if(!axi_master_port.aw_ready) // Wait for ready
+    //             timer_d = timer_q;
 
-        end else if(timer_q == 1) begin
-            // Increment address
-            if(write_address_q < end_address)
-                write_address_d = write_address_q + 8;
-            else
-                write_address_d = start_address;
-        end
+    //     end else if(timer_q == 6) begin
+    //         // Increment address
+    //         if(write_address_q < end_address)
+    //             write_address_d = write_address_q + 8;
+    //         else
+    //             write_address_d = start_address;
+    //     end
         
-    end
+    // end
 
 endmodule

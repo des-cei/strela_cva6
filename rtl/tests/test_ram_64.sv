@@ -46,7 +46,9 @@ module test_ram_64 (
 
         if (req_i) begin
             addr_q <= n_addr_q;
-        end else if (we_i) begin
+        end 
+        
+        if (we_i) begin
             mem[n_addr_q] <= wdata_i;
         end
 
