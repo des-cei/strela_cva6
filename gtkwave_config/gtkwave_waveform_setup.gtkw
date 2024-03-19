@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Mon Mar 18 09:56:49 2024
+[*] Tue Mar 19 11:45:10 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Mon Mar 18 09:54:48 2024"
-[dumpfile_size] 4376499
+[dumpfile_mtime] "Tue Mar 19 11:43:21 2024"
+[dumpfile_size] 4364840
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
-[size] 1850 1043
-[pos] 3910 -27
-*-4.005540 33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1850 1016
+[pos] 3910 0
+*-4.005540 28 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.sim_top.
-[sst_width] 233
+[sst_width] 291
 [signals_width] 297
 [sst_expanded] 1
-[sst_vpaned_height] 339
+[sst_vpaned_height] 553
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni
@@ -185,7 +185,17 @@ TOP.sim_top.master[0].w_valid
 TOP.sim_top.master[0].w_ready
 @1000200
 -AXI_W
-@23
+@22
 TOP.sim_top.i_test_ram.mem[639:0]
+@28
+TOP.sim_top.master[0].ar_ready
+TOP.sim_top.master[0].ar_valid
+@22
+TOP.sim_top.master[0].ar_addr[63:0]
+@28
+TOP.sim_top.master[0].r_ready
+TOP.sim_top.master[0].r_valid
+@23
+TOP.sim_top.master[0].r_data[63:0]
 [pattern_trace] 1
 [pattern_trace] 0

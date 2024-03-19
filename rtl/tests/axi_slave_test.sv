@@ -1,8 +1,11 @@
+`include "register_interface/assign.svh"
+`include "register_interface/typedef.svh"
+
 module axi_slave_test #(
     parameter int unsigned AXI_ID_WIDTH      = -1,
     parameter int unsigned AXI_ADDR_WIDTH    = -1,
     parameter int unsigned AXI_DATA_WIDTH    = -1,
-    parameter int unsigned AXI_USER_WIDTH    = -1,
+    parameter int unsigned AXI_USER_WIDTH    = -1
 ) (
     input   logic       clk_i,
     input   logic       rst_ni,
@@ -117,20 +120,14 @@ module axi_slave_test #(
     `REG_BUS_ASSIGN_TO_REQ(regbus_req, reg_bus)
     `REG_BUS_ASSIGN_FROM_RSP(reg_bus, regbus_rsp)
 
-    plic_top #(
-      .N_SOURCE    ( ariane_soc::NumSources  ),
-      .N_TARGET    ( ariane_soc::NumTargets  ),
-      .MAX_PRIO    ( ariane_soc::MaxPriority ),
+    test_reg_interface #(
       .reg_req_t   ( regbus_req_t            ),
       .reg_rsp_t   ( regbus_rsp_t            )
-    ) i_plic (
-      .clk_i,
-      .rst_ni,
-      .req_i         ( regbus_req    ),
-      .resp_o        ( regbus_rsp    ),
-      .le_i          ( '0          ), // 0:level 1:edge
-      .irq_sources_i ( irq_sources ),
-      .eip_targets_o ( irq_o       )
+    ) i_test_reg_interface (
+      .clk_i            (clk_i),
+      .rst_ni           (rst_ni),
+      .reg_req_i        ( regbus_req    ),
+      .reg_rsp_o        ( regbus_rsp    )
     );
 
 
@@ -149,6 +146,22 @@ module test_reg_interface #(
 );
 
 
+// reg_req_i.addr
+// reg_req_i.write
+// reg_req_i.wdata
+// reg_req_i.wstrb
+// reg_req_i.valid
+
+// reg_rsp_o.rdata
+// reg_rsp_o.error
+// reg_rsp_o.ready
+
+
+    assign reg_rsp_o.ready = 1'b1;
+    assign reg_rsp_o.error = 1'b0;
+
+    assign reg_rsp_o.rdata = 32'hAAAA_5555;
 
 
 endmodule
+

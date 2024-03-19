@@ -147,6 +147,17 @@ axi_xbar_intf #(
 .default_mst_port_i    ( '0         )
 );
 
+/////////////////// SLAVE TEST ///////////////////////////
+axi_slave_test #(
+    .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
+    .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
+    .AXI_DATA_WIDTH ( AxiDataWidth     ),
+    .AXI_USER_WIDTH ( AxiUserWidth     )
+) i_axi_slave_test (
+    .clk_i                 ( clk_i      ), // clk
+    .rst_ni                ( rst_ni     ), // ndmreset_n 
+    .axi_slave_port         (master[ariane_soc::DRAM])
+);
 
 /////////////////// MASTER TEST //////////////////////////
 // axi_master_test #(
@@ -194,7 +205,7 @@ axi2mem #(
 ) i_axi2rom (
     .clk_i  ( clk_i                   ),
     .rst_ni ( rst_ni                  ),
-    .slave  ( master[ariane_soc::DRAM]), // axi_bus_interface
+    .slave  ( master[ariane_soc::PLIC]), // axi_bus_interface ///////////////////////////////////////////////
     .req_o  ( ram_req                 ),
     .we_o   ( ram_we                  ),
     .addr_o ( ram_addr                ),

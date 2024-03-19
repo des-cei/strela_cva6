@@ -15,6 +15,9 @@ axi_src_dir = rtl/vendor/pulp-platform/axi/src
 verilator_inc_dirs = $(axi_src_dir)/../include/ 	\
 					rtl/vendor/pulp-platform/common_cells/include
 
+verilator_inc_dirs += rtl/vendor/pulp-platform/register_interface/include
+
+
 verilator_src_pkgs = $(axi_src_dir)/axi_pkg.sv
 
 
@@ -39,9 +42,16 @@ verilator_srcs =  rtl/tests/sim_top.sv rtl/tests/test_ram_64.sv
 verilator_srcs += rtl/tests/axi_master_test.sv
 
 
+verilator_srcs += rtl/vendor/pulp-platform/register_interface/src/reg_intf.sv
+verilator_srcs += rtl/tests/axi_slave_test.sv
+
+
 verilator_srcs += 	rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv
 
+verilator_srcs +=	rtl/vendor/pulp-platform/axi2apb/src/axi2apb_64_32.sv \
+					rtl/vendor/pulp-platform/register_interface/src/apb_to_reg.sv
 
+verilator_srcs  += 	$(wildcard rtl/vendor/pulp-platform/axi_slice/src/*.sv)
 
 ############# AXI etc sources ###########
 verilator_srcs  +=	rtl/vendor/pulp-platform/common_cells/src/rstgen_bypass.sv                       \
