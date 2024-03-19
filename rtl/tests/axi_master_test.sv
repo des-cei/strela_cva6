@@ -141,7 +141,7 @@ module axi_master_test #(
 
 
         // Read data:
-        axi_master_port.ar_addr = 'h9000_0000;
+        axi_master_port.ar_addr = 'h5000_0000;
         axi_master_port.ar_valid = 1'b1;
 
         axi_master_port.r_ready = 1'b1;

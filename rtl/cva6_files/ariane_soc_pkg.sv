@@ -29,12 +29,13 @@ package ariane_soc;
     PLIC     = 6,
     CLINT    = 7,
     ROM      = 8,
-    Debug    = 9
+    Debug    = 9,
+    Accelerator = 10
   } axi_slaves_t;
 
-  localparam NB_PERIPHERALS = Debug + 1;
+  localparam NB_PERIPHERALS = Accelerator + 1;
 
-
+  localparam logic[63:0] AcceleratorLength    = 64'h1000;
   localparam logic[63:0] DebugLength    = 64'h1000;
   localparam logic[63:0] ROMLength      = 64'h10000;
   localparam logic[63:0] CLINTLength    = 64'hC0000;
@@ -50,6 +51,7 @@ package ariane_soc;
   localparam bit GenProtocolChecker = 1'b0;
 
   typedef enum logic [63:0] {
+    
     DebugBase    = 64'h0000_0000,
     ROMBase      = 64'h0001_0000,
     CLINTBase    = 64'h0200_0000,
@@ -59,6 +61,7 @@ package ariane_soc;
     SPIBase      = 64'h2000_0000,
     EthernetBase = 64'h3000_0000,
     GPIOBase     = 64'h4000_0000,
+    AcceleratorBase = 64'h5000_0000,
     DRAMBase     = 64'h8000_0000
   } soc_bus_start_t;
 

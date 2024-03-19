@@ -114,7 +114,8 @@ assign addr_map = '{
 '{ idx: ariane_soc::SPI,      start_addr: ariane_soc::SPIBase,      end_addr: ariane_soc::SPIBase + ariane_soc::SPILength           },
 '{ idx: ariane_soc::Ethernet, start_addr: ariane_soc::EthernetBase, end_addr: ariane_soc::EthernetBase + ariane_soc::EthernetLength },
 '{ idx: ariane_soc::GPIO,     start_addr: ariane_soc::GPIOBase,     end_addr: ariane_soc::GPIOBase + ariane_soc::GPIOLength         },
-'{ idx: ariane_soc::DRAM,     start_addr: ariane_soc::DRAMBase,     end_addr: ariane_soc::DRAMBase + ariane_soc::DRAMLength         }
+'{ idx: ariane_soc::DRAM,     start_addr: ariane_soc::DRAMBase,     end_addr: ariane_soc::DRAMBase + ariane_soc::DRAMLength         },
+'{ idx: ariane_soc::Accelerator,     start_addr: ariane_soc::AcceleratorBase,     end_addr: ariane_soc::AcceleratorBase + ariane_soc::AcceleratorLength}
 };
 
 localparam axi_pkg::xbar_cfg_t AXI_XBAR_CFG = '{
@@ -156,7 +157,7 @@ axi_slave_test #(
 ) i_axi_slave_test (
     .clk_i                 ( clk_i      ), // clk
     .rst_ni                ( rst_ni     ), // ndmreset_n 
-    .axi_slave_port         (master[ariane_soc::DRAM])
+    .axi_slave_port         (master[ariane_soc::Accelerator])
 );
 
 /////////////////// MASTER TEST //////////////////////////
