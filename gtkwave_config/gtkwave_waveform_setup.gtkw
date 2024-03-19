@@ -1,21 +1,21 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Fri Mar 15 12:32:43 2024
+[*] Mon Mar 18 09:56:49 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Fri Mar 15 12:32:18 2024"
-[dumpfile_size] 10492496
+[dumpfile_mtime] "Mon Mar 18 09:54:48 2024"
+[dumpfile_size] 4376499
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
 [size] 1850 1043
-[pos] 1990 0
-*-2.974829 7 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 3910 -27
+*-4.005540 33 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.sim_top.
 [sst_width] 233
 [signals_width] 297
 [sst_expanded] 1
-[sst_vpaned_height] 328
+[sst_vpaned_height] 339
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni

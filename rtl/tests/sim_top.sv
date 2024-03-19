@@ -149,16 +149,32 @@ axi_xbar_intf #(
 
 
 /////////////////// MASTER TEST //////////////////////////
+// axi_master_test #(
+//     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
+//     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
+//     .AXI_DATA_WIDTH ( AxiDataWidth     ),
+//     .AXI_USER_WIDTH ( AxiUserWidth     ),
+//     .ADDRESS('h9000_0008),
+//     .DATA('h1234)
+// ) axi_master_test_2_i (
+//     .clk_i  (clk_i),
+//     .rst_ni (rst_ni),
+//     .axi_master_port (slave[0]) // Slave port in xbar // axi_bus_interface
+// );
+
 axi_master_test #(
     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
     .AXI_DATA_WIDTH ( AxiDataWidth     ),
-    .AXI_USER_WIDTH ( AxiUserWidth     )
+    .AXI_USER_WIDTH ( AxiUserWidth     ),
+    .ADDRESS('h9000_0004),
+    .DATA('hABCD)
 ) axi_master_test_i (
     .clk_i  (clk_i),
     .rst_ni (rst_ni),
     .axi_master_port (slave[2]) // Slave port in xbar // axi_bus_interface
 );
+
 
 
 ////////////// AXI to memory ///////////////
