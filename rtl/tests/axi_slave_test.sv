@@ -145,6 +145,7 @@ module test_reg_interface #(
   output reg_rsp_t reg_rsp_o
 );
 
+// Register interface signals
 
 // reg_req_i.addr
 // reg_req_i.write
@@ -156,12 +157,47 @@ module test_reg_interface #(
 // reg_rsp_o.error
 // reg_rsp_o.ready
 
-
+    logic [7:0]     reg_addr;
+    logic           reg_we;
+    
     assign reg_rsp_o.ready = 1'b1;
     assign reg_rsp_o.error = 1'b0;
 
-    assign reg_rsp_o.rdata = 32'hAAAA_5555;
+    assign reg_addr = reg_req_i.addr;
+    assign reg_we = reg_req_i.valid & reg_req_i.write;
 
+    // Some registers
+    logic [31:0] op_a;
+    logic [31:0] op_b;
+
+
+    // Register read
+    always_comb begin
+        case(reg_addr)
+            8'h00: reg_rsp_o.rdata = op_a;
+            8'h04: reg_rsp_o.rdata = op_b;
+            8'h08: reg_rsp_o.rdata = op_a + op_b;
+
+            default: reg_rsp_o.rdata = '0;
+        endcase
+    end
+
+    // Register write
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if(~rst_ni) begin
+            op_a <= '0;
+            op_b <= '0;
+        end else begin
+            if(reg_we) begin
+            case(reg_addr)
+                8'h00: op_a <= reg_req_i.wdata;
+                8'h04: op_b <= reg_req_i.wdata;
+            endcase
+            end
+        end
+    end
+
+    //assign reg_rsp_o.rdata = 32'hAAAA_5555;
 
 endmodule
 

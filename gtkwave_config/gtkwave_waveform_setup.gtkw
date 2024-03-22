@@ -1,24 +1,26 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Mar 19 12:14:37 2024
+[*] Fri Mar 22 09:18:03 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Tue Mar 19 12:13:12 2024"
-[dumpfile_size] 7125684
+[dumpfile_mtime] "Fri Mar 22 09:15:41 2024"
+[dumpfile_size] 20875076
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
 [size] 1850 1016
 [pos] 3910 0
-*-4.005540 28 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.005540 49 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.sim_top.
 [sst_width] 291
-[signals_width] 297
+[signals_width] 356
 [sst_expanded] 1
-[sst_vpaned_height] 535
+[sst_vpaned_height] 456
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni
+@200
+-RAM
 @22
 TOP.sim_top.i_test_ram.rdata_o[63:0]
 @28
@@ -30,6 +32,68 @@ TOP.sim_top.i_test_ram.we_i
 @22
 TOP.sim_top.i_test_ram.addr_i[63:0]
 @200
+-AXI Slave
+@c00201
+-AXI_AW
+@23
+TOP.sim_top.master[0].aw_addr[63:0]
+TOP.sim_top.master[0].aw_len[7:0]
+@29
+TOP.sim_top.master[0].aw_size[2:0]
+TOP.sim_top.master[0].aw_valid
+TOP.sim_top.master[0].aw_ready
+@1401201
+-AXI_AW
+@c00200
+-AXI_W
+@22
+TOP.sim_top.master[0].w_data[63:0]
+@28
+TOP.sim_top.master[0].w_last
+@22
+TOP.sim_top.master[0].w_strb[7:0]
+@28
+TOP.sim_top.master[0].w_valid
+TOP.sim_top.master[0].w_ready
+@1401200
+-AXI_W
+@800200
+-MEMORY
+@22
+TOP.sim_top.i_test_ram.mem[639:0]
+@28
+TOP.sim_top.master[10].ar_valid
+TOP.sim_top.master[10].ar_ready
+@22
+TOP.sim_top.master[10].ar_addr[63:0]
+@28
+TOP.sim_top.master[10].r_valid
+TOP.sim_top.master[10].r_ready
+@22
+TOP.sim_top.master[10].r_data[63:0]
+@1000200
+-MEMORY
+@200
+-
+-AXI Master 0
+@22
+TOP.sim_top.slave[0].aw_addr[63:0]
+@28
+TOP.sim_top.slave[0].aw_valid
+TOP.sim_top.slave[0].aw_ready
+@22
+TOP.sim_top.slave[0].w_data[63:0]
+@28
+TOP.sim_top.slave[0].w_valid
+TOP.sim_top.slave[0].w_ready
+@200
+-
+-AXI Slave 10
+@22
+TOP.sim_top.master[10].aw_addr[63:0]
+TOP.sim_top.master[10].w_data[63:0]
+@200
+-
 -AXI Master
 @c00200
 -AXI_AR
@@ -46,7 +110,7 @@ TOP.sim_top.slave[2].ar_valid
 TOP.sim_top.slave[2].ar_ready
 @1401200
 -AXI_AR
-@800200
+@c00200
 -AXI_R
 @22
 TOP.sim_top.slave[2].r_data[63:0]
@@ -56,9 +120,9 @@ TOP.sim_top.slave[2].r_resp[1:0]
 TOP.sim_top.slave[2].r_last
 TOP.sim_top.slave[2].r_valid
 TOP.sim_top.slave[2].r_ready
-@1000200
+@1401200
 -AXI_R
-@800200
+@c00200
 -AXI_AW
 @22
 TOP.sim_top.slave[2].aw_addr[63:0]
@@ -67,9 +131,19 @@ TOP.sim_top.slave[2].aw_len[7:0]
 TOP.sim_top.slave[2].aw_size[2:0]
 TOP.sim_top.slave[2].aw_valid
 TOP.sim_top.slave[2].aw_ready
-@1000200
+@1401200
 -AXI_AW
-@800200
+@c00200
+-AXI_B
+@22
+TOP.sim_top.slave[2].b_id[3:0]
+@28
+TOP.sim_top.slave[2].b_resp[1:0]
+TOP.sim_top.slave[2].b_valid
+TOP.sim_top.slave[2].b_ready
+@1401200
+-AXI_B
+@c00200
 -AXI_W
 @c00022
 TOP.sim_top.slave[2].w_data[63:0]
@@ -147,55 +221,7 @@ TOP.sim_top.slave[2].w_strb[7:0]
 @28
 TOP.sim_top.slave[2].w_valid
 TOP.sim_top.slave[2].w_ready
-@1000200
--AXI_W
-@c00200
--AXI_B
-@22
-TOP.sim_top.slave[2].b_id[3:0]
-@28
-TOP.sim_top.slave[2].b_resp[1:0]
-TOP.sim_top.slave[2].b_valid
-TOP.sim_top.slave[2].b_ready
 @1401200
--AXI_B
-@200
--AXI Slave
-@800200
--AXI_AW
-@22
-TOP.sim_top.master[0].aw_addr[63:0]
-TOP.sim_top.master[0].aw_len[7:0]
-@28
-TOP.sim_top.master[0].aw_size[2:0]
-TOP.sim_top.master[0].aw_valid
-TOP.sim_top.master[0].aw_ready
-@1000200
--AXI_AW
-@800200
 -AXI_W
-@22
-TOP.sim_top.master[0].w_data[63:0]
-@28
-TOP.sim_top.master[0].w_last
-@22
-TOP.sim_top.master[0].w_strb[7:0]
-@28
-TOP.sim_top.master[0].w_valid
-TOP.sim_top.master[0].w_ready
-@1000200
--AXI_W
-@22
-TOP.sim_top.i_test_ram.mem[639:0]
-@28
-TOP.sim_top.master[10].ar_valid
-TOP.sim_top.master[10].ar_ready
-@22
-TOP.sim_top.master[10].ar_addr[63:0]
-@28
-TOP.sim_top.master[10].r_valid
-TOP.sim_top.master[10].r_ready
-@23
-TOP.sim_top.master[10].r_data[63:0]
 [pattern_trace] 1
 [pattern_trace] 0

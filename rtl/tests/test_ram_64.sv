@@ -18,6 +18,7 @@ module test_ram_64 (
    input  logic         clk_i,
    input  logic         req_i,
    input  logic         we_i,
+   input  logic [7:0]   be_i,
    input  logic [63:0]  addr_i,
    output logic [63:0]  rdata_o,
    input  logic [63:0]  wdata_i
@@ -45,12 +46,22 @@ module test_ram_64 (
     always_ff @(posedge clk_i) begin
 
         if (req_i) begin
-            addr_q <= n_addr_q;
+            if(!we_i) begin
+                addr_q <= n_addr_q;
+            end else begin
+                integer i;
+                for(i=0; i<8; i++)
+                    if(be_i[i]) mem[n_addr_q][8*i +:8] <= wdata_i[8*i +:8]; // Index of LSB +: width
+                // if(be_i[0]) mem[n_addr_q][7:0] <= wdata_i[7:0];
+                // if(be_i[1]) mem[n_addr_q][15:8] <= wdata_i[15:8];
+                // if(be_i[2]) mem[n_addr_q][23:16] <= wdata_i[23:16];
+                // if(be_i[3]) mem[n_addr_q][31:24] <= wdata_i[31:24];
+            end
         end 
         
-        if (we_i) begin
-            mem[n_addr_q] <= wdata_i;
-        end
+        // if (we_i) begin
+        //     mem[n_addr_q] <= wdata_i;
+        // end
 
     end
 
