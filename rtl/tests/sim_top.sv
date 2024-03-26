@@ -16,7 +16,7 @@ always_ff @(posedge clk_i) begin
     end
 
     // Default
-    count_d = count_q + 1;
+    count_d <= count_q + 1;
 
     case(count_q)
 
@@ -173,13 +173,13 @@ axi_xbar_intf #(
 
 
 /////////////////// MASTER SLAVE TEST ///////////////////////////
-axi_master_slave_test #(
+axi_cgra_top #(
     .AXI_ID_WIDTH_MASTER   ( AxiIdWidthMaster ),
     .AXI_ID_WIDTH_SLAVE    ( AxiIdWidthSlaves ),
     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
     .AXI_DATA_WIDTH ( AxiDataWidth     ),
     .AXI_USER_WIDTH ( AxiUserWidth     )
-) i_axi_master_slave_test (
+) i_axi_cgar_top (
     .clk_i                  ( clk_i      ), // clk
     .rst_ni                 ( rst_ni     ), // ndmreset_n 
     .axi_slave_port         (master[ariane_soc::Accelerator]),

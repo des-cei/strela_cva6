@@ -1,4 +1,4 @@
-export VERILATOR_ROOT= /home/juangranja/Documents/verilator-5.020
+export VERILATOR_ROOT= /home/juangranja/Documentos/verilator-5.020
 
 VERILATOR= $(VERILATOR_ROOT)/bin/verilator
 
@@ -40,7 +40,12 @@ verilator_src_pkgs += 	rtl/cva6_files/ariane_soc_pkg.sv \
 verilator_srcs =  rtl/tests/sim_top.sv rtl/tests/test_ram_64.sv
 # verilator_srcs += rtl/tests/axi_master.sv
 # verilator_srcs += rtl/tests/axi_master_test.sv
-verilator_srcs += rtl/tests/axi_master_slave_test.sv
+# verilator_srcs += rtl/tests/axi_master_slave_test.sv
+
+verilator_srcs += rtl/tests/axi_cgra_top.sv
+verilator_srcs += rtl/tests/test_csr.sv
+verilator_srcs += rtl/tests/test_state_machines.sv
+verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
 
 
 verilator_srcs += rtl/vendor/pulp-platform/register_interface/src/reg_intf.sv
@@ -90,7 +95,8 @@ verilator_srcs += 	$(axi_src_dir)/axi_intf.sv									\
 					$(axi_src_dir)/axi_err_slv.sv                             	\
 					$(axi_src_dir)/axi_mux.sv                                 	\
 					$(axi_src_dir)/axi_demux.sv                               	\
-					$(axi_src_dir)/axi_xbar.sv	
+					$(axi_src_dir)/axi_xbar.sv									\
+					$(axi_src_dir)/axi_lite_to_axi.sv	
 
 
 
