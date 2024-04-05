@@ -86,6 +86,15 @@ module axi_cgra_top #(
         .rst_ni (rst_ni),
         .axi_master_port (axi_lite_bus),
 
+        .execute_i(1'b1),
+        .data_input_o(),
+        .data_input_valid_o(),
+        .data_input_ready_i(),
+        .data_input_addr_i('{32'h83000004,32'h82000000,32'h81000000,32'h80000000}),
+        .data_input_size_i('{16'h20, 16'h10, 16'h20, 16'h10}),//'{default: '0}), // '{16'h8, 16'h8, 16'h8, 16'h8}
+        .data_input_stride_i('{16'h8, 16'h8, 16'h8, 16'h8}), //'{16'h4, 16'h4, 16'h4, 16'h4}),
+
+        // Test
         .r_address_i (test_r_address),
         .r_data_i (test_r_data_w),
         .r_data_o (test_r_data_r),

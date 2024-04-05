@@ -1,4 +1,4 @@
-export VERILATOR_ROOT= /home/juangranja/Documentos/verilator-5.020
+export VERILATOR_ROOT= /home/juangranja/Documents/verilator-5.020
 
 VERILATOR= $(VERILATOR_ROOT)/bin/verilator
 
@@ -103,7 +103,7 @@ verilator_srcs += 	$(axi_src_dir)/axi_intf.sv									\
 
 verilator_cpp_testbench = rtl/tests/counter_tb.cpp
 
-verilate_command = 	$(VERILATOR) --no-timing
+verilate_command = 	$(VERILATOR) --no-timing --assert
 verilate_command +=	-Wall --trace -cc
 verilate_command +=	$(verilator_src_pkgs)
 verilate_command +=	$(verilator_srcs)

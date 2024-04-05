@@ -20,66 +20,7 @@ always_ff @(posedge clk_i) begin
 
     case(count_q)
 
-        // 10: begin
 
-        //     slave[0].aw_addr <= 32'h9000_0000;
-        //     slave[0].w_data  <= 64'haaaa_bbbb_cccc_dddd;
-            
-            
-        //     slave[0].aw_size <= 3'b011;
-        //     slave[0].w_strb <= 8'b11110000;
-        //     slave[0].w_last <= 1'b1;
-
-        //     slave[0].aw_valid <= 1;
-        //     slave[0].w_valid <= 1;
-
-        //     slave[0].b_ready <= 1;
-
-        // end
-
-
-        // 0: begin
-        //     master[ariane_soc::DRAM].aw_ready <= 1'b1;
-        //     master[ariane_soc::DRAM].w_ready <= 1'b1;
-        //     master[ariane_soc::DRAM].b_valid <= 1'b1;
-        // master[ariane_soc::DRAM].b_id <= 'h20;
-        // end
-
-        // Address   32'h5000_0014
-        // Wdata     32'h5000_0018
-        // Start     32'h5000_001C
-
-
-        10: begin
-
-            slave[0].aw_addr <= 32'h5000_0010;
-            slave[0].w_data  <= 32'h9000_0004;
-            
-            
-            slave[0].aw_size <= 3'b010;
-            slave[0].w_strb <= '1;
-            slave[0].w_last <= 1'b1;
-
-            slave[0].aw_valid <= 1;
-            slave[0].w_valid <= 1;
-
-            slave[0].b_ready <= 1;
-
-        end
-
-        20: begin
-
-            slave[0].aw_addr <= 32'h5000_0020;
-            slave[0].w_data  <= 32'h2424_4242;
-            
-        end
-
-        30: begin
-
-            slave[0].aw_addr <= 32'h5000_0028;
-            slave[0].w_data  <= 32'h0000_0001;
-            
-        end
 
 
         
@@ -179,7 +120,7 @@ axi_cgra_top #(
     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
     .AXI_DATA_WIDTH ( AxiDataWidth     ),
     .AXI_USER_WIDTH ( AxiUserWidth     )
-) i_axi_cgar_top (
+) i_axi_cgra_top (
     .clk_i                  ( clk_i      ), // clk
     .rst_ni                 ( rst_ni     ), // ndmreset_n 
     .axi_slave_port         (master[ariane_soc::Accelerator]),
@@ -208,7 +149,7 @@ axi2mem #(
 ) i_axi2rom (
     .clk_i  ( clk_i                   ),
     .rst_ni ( rst_ni                  ),
-    .slave  ( master[ariane_soc::DRAM]), // axi_bus_interface ///////////////////////////////////////////////
+    .slave  ( master[ariane_soc::DRAM]),
     .req_o  ( ram_req                 ),
     .we_o   ( ram_we                  ),
     .addr_o ( ram_addr                ),
@@ -230,85 +171,3 @@ test_ram_64 i_test_ram(
 );
 
 endmodule
-
-
-/////////////////// SLAVE TEST ///////////////////////////
-// axi_slave_test #(
-//     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
-//     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
-//     .AXI_DATA_WIDTH ( AxiDataWidth     ),
-//     .AXI_USER_WIDTH ( AxiUserWidth     )
-// ) i_axi_slave_test (
-//     .clk_i                 ( clk_i      ), // clk
-//     .rst_ni                ( rst_ni     ), // ndmreset_n 
-//     .axi_slave_port         (master[ariane_soc::Accelerator])
-// );
-
-/////////////////// MASTER TEST //////////////////////////
-// axi_master_test #(
-//     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
-//     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
-//     .AXI_DATA_WIDTH ( AxiDataWidth     ),
-//     .AXI_USER_WIDTH ( AxiUserWidth     ),
-//     .ADDRESS('h9000_0008),
-//     .DATA('h1234)
-// ) axi_master_test_2_i (
-//     .clk_i  (clk_i),
-//     .rst_ni (rst_ni),
-//     .axi_master_port (slave[0]) // Slave port in xbar // axi_bus_interface
-// );
-
-// axi_master_test #(
-//     .AXI_ID_WIDTH   ( AxiIdWidthMaster ),
-//     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
-//     .AXI_DATA_WIDTH ( AxiDataWidth     ),
-//     .AXI_USER_WIDTH ( AxiUserWidth     ),
-//     .ADDRESS('h9000_0004),
-//     .DATA('hABCD)
-// ) axi_master_test_i (
-//     .clk_i  (clk_i),
-//     .rst_ni (rst_ni),
-//     .axi_master_port (slave[2]) // Slave port in xbar // axi_bus_interface
-// );
-
-
-
-
-// initial begin
-    
-//     //@(posedge rst_ni);
-
-//     @(negedge clk_i);
-//     repeat(10) @(negedge clk_i);
-
-//     $finish;
-
-//     // repeat(1) @(negedge clk_i);
-//     // ram_req = 1'b1;
-//     // @(negedge clk_i);
-//     // ram_req = 1'b1;
-//     // ram_addr = 'd8;
-//     // @(negedge clk_i);
-//     // ram_req = 1'b0;
-
-//     // @(negedge clk_i);
-//     // ram_we = 1'b1;
-//     // ram_wdata = 64'h0123_4567_89AB_CDEF;
-
-//     // @(negedge clk_i);
-//     // ram_we = 1'b0;
-//     // ram_req = 1'b1;
-
-// end
-
-// cgra_axi_master #(
-//     .AXI_ID_WIDTH   ( AxiIdWidthSlaves ),
-//     .AXI_ADDR_WIDTH ( AxiAddrWidth     ),
-//     .AXI_DATA_WIDTH ( AxiDataWidth     ),
-//     .AXI_USER_WIDTH ( AxiUserWidth     )
-// ) cgra_axi_master_i (
-//     .clk_i  (clk_i),
-//     .rst_ni (rst_ni),
-//     .axi_master_port (axi_bus_interface)
-// );
-
