@@ -114,6 +114,8 @@ module test_state_machines #(
     logic input_outst_fifo_empty;
     logic input_outst_fifo_full;
 
+    // Reset signal for address offset after completed
+    logic data_input_reset_address_offset;
 
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -138,6 +140,8 @@ module test_state_machines #(
             data_input_execute_d = 1'b1;
         else if (input_outst_fifo_empty)
             data_input_execute_d = 1'b0;
+
+        data_input_reset_address_offset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
     end
 
     // Read address arbitration
@@ -161,6 +165,9 @@ module test_state_machines #(
                 data_input_addr_offs_d[i] = data_input_addr_offs_q[i] + data_input_stride_i[i];
             end
         end
+
+        if(data_input_reset_address_offset)
+            data_input_addr_offs_d = '{default: '0};
 
         
         // Save transaction in outstanding FIFO
@@ -322,6 +329,8 @@ module test_state_machines #(
     logic output_outst_fifo_empty;
     logic output_outst_fifo_full;
 
+    logic data_output_reset_address_offset;
+
 
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -357,6 +366,8 @@ module test_state_machines #(
             data_output_execute_d = 1'b0;
 
         data_output_done_o =  !data_output_execute_q;
+
+        data_output_reset_address_offset = data_output_execute_q & !data_output_execute_d; // Active for one cycle
     end
 
     // Write address arbitration
@@ -380,6 +391,9 @@ module test_state_machines #(
                 data_output_addr_offs_d[i] = data_output_addr_offs_q[i] + 32'h4;
             end
         end
+
+        if(data_output_reset_address_offset)
+            data_output_addr_offs_d = '{default: '0};
 
         // Save transaction in outstanding FIFO
         output_outst_fifo_in.pe_one_hot = data_output_arb_grant_one_hot;
