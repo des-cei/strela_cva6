@@ -16,6 +16,41 @@ module axi_cgra_top #(
     AXI_BUS.Master      axi_master_port
 );
 
+    localparam INPUT_NODES_NUM = 4;
+    localparam OUTPUT_NODES_NUM = 4;
+
+    logic test_cgra_execute_input;
+    logic test_cgra_execute_output;
+
+    // For simulation only
+    logic [31:0] count_q;
+    always_ff @(posedge clk_i) begin
+        if(!rst_ni)
+            count_q <= '0;
+
+        // Default
+        count_q <= count_q + 1;
+
+        case(count_q)
+            0:  begin
+                test_cgra_execute_input <= 0;
+                test_cgra_execute_output <= 0;
+            end
+
+            10: begin
+                test_cgra_execute_input <= 1;
+                test_cgra_execute_output <= 1;
+            end
+            11: begin
+                test_cgra_execute_input <= 0;
+                test_cgra_execute_output <= 0;
+            end
+
+            // 12: test_cgra_execute_output <= 1;
+            // 13: test_cgra_execute_output <= 0;
+            
+        endcase
+    end
 
     // define types regbus_req_t, regbus_rsp_t
     `REG_BUS_TYPEDEF_ALL(regbus, logic[31:0], logic[31:0], logic[3:0])
@@ -79,27 +114,56 @@ module axi_cgra_top #(
         .start_write_o  ( test_start_write  )
     );
 
+    logic [32*INPUT_NODES_NUM-1:0] cgra_data_input_data;
+    logic [INPUT_NODES_NUM-1:0] cgra_data_input_valid;
+    logic [INPUT_NODES_NUM-1:0] cgra_data_input_ready;
 
+    logic [32*OUTPUT_NODES_NUM-1:0] cgra_data_output_data;
+    logic [OUTPUT_NODES_NUM-1:0] cgra_data_output_valid;
+    logic [OUTPUT_NODES_NUM-1:0] cgra_data_output_ready;
 
     test_state_machines i_test_state_machines (
         .clk_i  (clk_i),
         .rst_ni (rst_ni),
         .axi_master_port (axi_lite_bus),
 
-        .execute_i(1'b1),
-        .data_input_o(),
-        .data_input_valid_o(),
-        .data_input_ready_i(),
-        .data_input_addr_i('{32'h83000004,32'h82000000,32'h81000000,32'h80000000}),
-        .data_input_size_i('{16'h20, 16'h10, 16'h20, 16'h10}),//'{default: '0}), // '{16'h8, 16'h8, 16'h8, 16'h8}
-        .data_input_stride_i('{16'h8, 16'h8, 16'h8, 16'h8}), //'{16'h4, 16'h4, 16'h4, 16'h4}),
+        // Execute
+        .execute_input_i(test_cgra_execute_input),
+        .execute_output_i(test_cgra_execute_output),
 
-        // Test
-        .r_address_i (test_r_address),
-        .r_data_i (test_r_data_w),
-        .r_data_o (test_r_data_r),
-        .start_read_i (test_start_read),
-        .start_write_i (test_start_write)
+        // CGRA input data signals
+        .data_input_o        ( cgra_data_input_data ),
+        .data_input_valid_o  ( cgra_data_input_valid ),
+        .data_input_ready_i  ( cgra_data_input_ready ),
+        .data_input_addr_i   ('{32'h8300000C,32'h82000008,32'h81000004,32'h80000000}),
+        .data_input_size_i   ('{16'h8, 16'h8, 16'h8, 16'h8}), // '{16'h20, 16'h10, 16'h20, 16'h10}
+        .data_input_stride_i ('{16'h8, 16'h8, 16'h8, 16'h8}),
+
+        // CGRA output data signals
+        .data_output_i       ( cgra_data_output_data ),
+        .data_output_valid_i ( cgra_data_output_valid ),
+        .data_output_ready_o ( cgra_data_output_ready ),
+        .data_output_addr_i  ( '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050}),
+        .data_output_size_i  ( '{16'h04, 16'h04, 16'h04, 16'h04}), // '{16'h10, 16'h08, 16'h10, 16'h08}
+        .data_output_done_o  ( )
+    );
+
+
+    mock_CGRA cgra_i
+    (
+        .clk                ( clk_i ),
+        .rst_n              (  ),
+        .clk_bs             (  ),
+        .rst_n_bs           (  ),
+        .data_in            ( cgra_data_input_data   ),
+        .data_in_valid      ( cgra_data_input_valid  ),
+        .data_in_ready      ( cgra_data_input_ready  ),
+        .data_out           ( cgra_data_output_data  ),
+        .data_out_valid     ( cgra_data_output_valid ),
+        .data_out_ready     ( cgra_data_output_ready ),
+        .config_bitstream   (  ),
+        .bitstream_enable_i (  ),
+        .execute_i          (  )
     );
 
 endmodule

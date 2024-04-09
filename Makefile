@@ -46,6 +46,7 @@ verilator_srcs += rtl/tests/axi_cgra_top.sv
 verilator_srcs += rtl/tests/test_csr.sv
 verilator_srcs += rtl/tests/test_state_machines.sv
 verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
+verilator_srcs += rtl/tests/mock_cgra.sv
 
 
 verilator_srcs += rtl/vendor/pulp-platform/register_interface/src/reg_intf.sv

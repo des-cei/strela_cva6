@@ -23,9 +23,19 @@ module test_ram_64 (
    output logic [63:0]  rdata_o,
    input  logic [63:0]  wdata_i
 );
-    localparam int RamSize = 10;
+    localparam int RamSize = 20;
 
     logic [RamSize-1:0][63:0] mem = {
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
+        64'haa000000_bb000000,
         64'ha0900000_b0900000,
         64'ha0800000_b0800000,
         64'ha0700000_b0700000,

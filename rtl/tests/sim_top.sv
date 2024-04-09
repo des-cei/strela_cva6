@@ -11,12 +11,9 @@ assign count = count_q;
 always_ff @(posedge clk_i) begin
     if(!rst_ni)
         count_q <= '0;
-    else begin
-        count_q <= count_d;
-    end
 
     // Default
-    count_d <= count_q + 1;
+    count_q <= count_q + 1;
 
     case(count_q)
 
