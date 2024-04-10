@@ -20,7 +20,10 @@ module test_csr #(
     output logic [15:0] data_output_size_o [OUTPUT_NODES_NUM-1:0],
 
     input  logic test_done_i,
-    output logic execute_o
+    output logic execute_o,
+
+    // Test debug:
+    input  logic [31:0] test_debug_words [5:0]
 );
 
 // Register interface signals
@@ -90,6 +93,14 @@ module test_csr #(
             // Control/status
             8'h50: reg_rsp_o.rdata = test_done_i;
 
+            // Debug
+            8'h50: reg_rsp_o.rdata = test_debug_words [0];
+            8'h54: reg_rsp_o.rdata = test_debug_words [1];
+            8'h58: reg_rsp_o.rdata = test_debug_words [2];
+            8'h5C: reg_rsp_o.rdata = test_debug_words [3];
+            8'h60: reg_rsp_o.rdata = test_debug_words [4];
+            8'h64: reg_rsp_o.rdata = test_debug_words [5];
+
             default: reg_rsp_o.rdata = '0;
         endcase
     end
@@ -101,11 +112,11 @@ module test_csr #(
             op_b <= '0;
 
             data_input_addr_o <= '{32'h8300000C,32'h82000008,32'h81000004,32'h80000000};
-            data_input_size_o <= '{16'h8, 16'h8, 16'h8, 16'h8};
-            data_input_stride_o <= '{16'h8, 16'h8, 16'h8, 16'h8};
+            data_input_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
+            data_input_stride_o <= '{16'h0, 16'h0, 16'h0, 16'h4};
 
             data_output_addr_o <= '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050};
-            data_output_size_o <= '{16'h04, 16'h04, 16'h04, 16'h04};
+            data_output_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
 
 
         end else begin

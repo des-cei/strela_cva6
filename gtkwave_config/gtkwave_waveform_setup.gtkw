@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Apr  9 10:31:18 2024
+[*] Wed Apr 10 10:17:36 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Tue Apr  9 10:30:33 2024"
-[dumpfile_size] 5994118
+[dumpfile_mtime] "Wed Apr 10 10:14:37 2024"
+[dumpfile_size] 10726253
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
 [size] 1850 1016
-[pos] 0 108
-*-6.005540 136 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 0 135
+*-7.005540 114 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.sim_top.
 [treeopen] TOP.sim_top.i_axi_cgra_top.
@@ -24,13 +24,14 @@
 [sst_width] 413
 [signals_width] 462
 [sst_expanded] 1
-[sst_vpaned_height] 204
+[sst_vpaned_height] 279
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni
 @200
 -
 @22
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.cycle_count_o[31:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifo_count[0][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_addr_offs_q[0][31:0]
 @200
@@ -39,7 +40,15 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_addr_offs_q[0][31:0]
 @800200
 -SM_Input
 @28
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.execute_input_i
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_execute_d
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_execute_q
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_end_cycle_reset
+@200
+-
+@29
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_full
+@28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.ar_master_free
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.new_ar_trans
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_request[3:0]
@@ -66,15 +75,20 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_empty
 TOP.sim_top.clk_i
 @200
 -
-@22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_unsent_count[0][3:0]
+@800200
+-SM_Output
 @28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_grant_one_hot[3:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.output_outst_fifo_out[4:0]
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.execute_output_i
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_execute_d
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_execute_q
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_done_o
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_end_cycle_reset
 @200
 -
 @28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_request[3:0]
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_grant_one_hot[3:0]
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.output_outst_fifo_out[4:0]
 @200
 -
 @28
@@ -102,10 +116,12 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_write_adress_q[31:0]
 @28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.aw_master_free
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.new_aw_trans
+@1000200
+-SM_Output
 @200
 -
 -CGRA AXI Master
-@29
+@28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_done_o
 @c00200
 -AXI_AR

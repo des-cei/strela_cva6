@@ -32,27 +32,27 @@ always_ff @(posedge clk_i) begin
             slave[0].b_ready <= 1;
             end
 
-            15: begin
+            11: begin
             slave[0].aw_valid <= 0;
             slave[0].w_valid <= 0;
             end
 
-            50: begin 
-            slave[0].aw_valid <= 1;
-            slave[0].w_valid <= 1;
-            end
+            // 50: begin 
+            // slave[0].aw_valid <= 1;
+            // slave[0].w_valid <= 1;
+            // end
 
 
-            55: begin  
-            slave[0].aw_valid <= 0;
-            slave[0].w_valid <= 0;
-            end
+            // 51: begin  
+            // slave[0].aw_valid <= 0;
+            // slave[0].w_valid <= 0;
+            // end
 
 
 
 
         
-        200: $finish;
+        500: $finish;
     endcase
 end
 

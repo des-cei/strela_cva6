@@ -46,7 +46,16 @@ module test_state_machines #(
     input   logic [31:0] data_output_addr_i [OUTPUT_NODES_NUM-1:0],
     input   logic [15:0] data_output_size_i [OUTPUT_NODES_NUM-1:0],
 
-    output  logic data_output_done_o
+    output  logic data_output_done_o,
+
+    // Test
+    output  logic [31:0] cycle_count_o,
+    output  logic [31:0] dbg_word0,
+    output  logic [31:0] dbg_word1,
+    output  logic [31:0] dbg_word2,
+    output  logic [31:0] dbg_word3,
+    output  logic [31:0] dbg_word4,
+    output  logic [31:0] dbg_word5
 );
 
     localparam MAX_OUTSTANDING = 4;
@@ -115,7 +124,7 @@ module test_state_machines #(
     logic input_outst_fifo_full;
 
     // Reset signal for address offset after completed
-    logic data_input_reset_address_offset;
+    logic data_input_end_cycle_reset;
 
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -133,6 +142,22 @@ module test_state_machines #(
 
     end
 
+    // Debug
+    always_comb begin
+        dbg_word0[0] = data_input_execute_q;
+        dbg_word0[1] = wait_ar_q;
+
+        dbg_word0[2+3:2] = data_input_fifo_count[0];
+        dbg_word0[6+1:6] = input_outst_fifo_count;
+
+        dbg_word0[8] = ar_master_free;
+
+        dbg_word0[9] = data_input_arb_enable;
+
+        dbg_word1 = axi_read_adress_q;
+        dbg_word2 = data_input_addr_offs_q[0];
+    end
+
     // Execute
     always_comb begin
         data_input_execute_d = data_input_execute_q;
@@ -141,7 +166,7 @@ module test_state_machines #(
         else if (input_outst_fifo_empty)
             data_input_execute_d = 1'b0;
 
-        data_input_reset_address_offset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
+        data_input_end_cycle_reset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
     end
 
     // Read address arbitration
@@ -166,7 +191,7 @@ module test_state_machines #(
             end
         end
 
-        if(data_input_reset_address_offset)
+        if(data_input_end_cycle_reset)
             data_input_addr_offs_d = '{default: '0};
 
         
@@ -329,7 +354,9 @@ module test_state_machines #(
     logic output_outst_fifo_empty;
     logic output_outst_fifo_full;
 
-    logic data_output_reset_address_offset;
+    logic data_output_end_cycle_reset;
+
+    logic [31:0] cycle_count_d, cycle_count_q;
 
 
 
@@ -340,16 +367,36 @@ module test_state_machines #(
             wait_aw_q <= 0;
             axi_write_adress_q <= '0;
             data_output_addr_offs_q <= '{default: '0};
+            cycle_count_q <= 0;
         end else begin
             data_output_execute_q <= data_output_execute_d;
             wait_aw_q <= wait_aw_d;
             axi_write_adress_q <= axi_write_adress_d;
-            data_output_addr_offs_q <= data_output_addr_offs_d;         
+            data_output_addr_offs_q <= data_output_addr_offs_d;
+            cycle_count_q <= cycle_count_d;         
         end
 
     end
 
     logic [OUTPUT_NODES_NUM-1:0] data_output_address_under_size;
+
+        // Debug
+    always_comb begin
+        dbg_word3[0] = data_output_execute_q;
+        dbg_word3[1] = wait_aw_q;
+
+        dbg_word3[2+3:2] = data_output_fifo_count[0];
+        dbg_word3[6+1:6] = output_outst_fifo_count;
+
+        dbg_word3[8] = aw_master_free;
+
+        dbg_word3[9] = data_output_arb_enable;
+
+        dbg_word3[10+4:10] = data_output_address_under_size;
+
+        dbg_word4 = axi_write_adress_q;
+        dbg_word5 = data_output_addr_offs_q[0];
+    end
 
     // Address comparators
     always_comb begin
@@ -367,7 +414,14 @@ module test_state_machines #(
 
         data_output_done_o =  !data_output_execute_q;
 
-        data_output_reset_address_offset = data_output_execute_q & !data_output_execute_d; // Active for one cycle
+        data_output_end_cycle_reset = data_output_execute_q & !data_output_execute_d; // Active for one cycle
+
+        if(execute_output_i)
+            cycle_count_d = 0;
+        else if(!data_output_done_o)
+            cycle_count_d = cycle_count_q + 1;
+        
+        cycle_count_o = cycle_count_q;
     end
 
     // Write address arbitration
@@ -392,7 +446,7 @@ module test_state_machines #(
             end
         end
 
-        if(data_output_reset_address_offset)
+        if(data_output_end_cycle_reset)
             data_output_addr_offs_d = '{default: '0};
 
         // Save transaction in outstanding FIFO
@@ -583,7 +637,7 @@ module up_down_counter # (
     input   logic   rst_ni,
     input   logic   up_i,
     input   logic   down_i,
-    output  logic [$clog2(WIDTH)-1:0] count_o
+    output  logic [WIDTH-1:0] count_o
 );
     always_ff @(posedge clk_i) begin
         if (!rst_ni)

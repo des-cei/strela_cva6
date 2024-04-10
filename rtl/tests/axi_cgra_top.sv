@@ -100,6 +100,9 @@ module axi_cgra_top #(
     logic test_execute;
 
 
+    logic [31:0] test_debug_words [5:0];
+
+
     test_csr #(
         .reg_req_t      ( regbus_req_t      ),
         .reg_rsp_t      ( regbus_rsp_t      )
@@ -115,7 +118,8 @@ module axi_cgra_top #(
         .data_output_addr_o  ( data_output_addr  ),
         .data_output_size_o  ( data_output_size  ),
         .test_done_i ( test_done ),
-        .execute_o ( test_execute )
+        .execute_o ( test_execute ),
+        .test_debug_words(test_debug_words)
     );
 
     logic [32*INPUT_NODES_NUM-1:0] cgra_data_input_data;
@@ -149,7 +153,18 @@ module axi_cgra_top #(
         .data_output_ready_o ( cgra_data_output_ready ),
         .data_output_addr_i  ( data_output_addr ), // '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050}
         .data_output_size_i  ( data_output_size ), // '{16'h04, 16'h04, 16'h04, 16'h04}
-        .data_output_done_o  ( test_done )
+        .data_output_done_o  ( test_done ),
+
+        // Test
+        .cycle_count_o(),
+
+        .dbg_word0(test_debug_words[0]),
+        .dbg_word1(test_debug_words[1]),
+        .dbg_word2(test_debug_words[2]),
+        .dbg_word3(test_debug_words[3]),
+        .dbg_word4(test_debug_words[4]),
+        .dbg_word5(test_debug_words[5])
+
     );
 
 
