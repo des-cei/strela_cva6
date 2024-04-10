@@ -23,6 +23,7 @@ module test_csr #(
     output logic execute_o,
 
     // Test debug:
+    input  logic [31:0] test_cycle_count_i,
     input  logic [31:0] test_debug_words [5:0],
     output logic reset_state_machines_o
 );
@@ -95,12 +96,21 @@ module test_csr #(
             8'h50: reg_rsp_o.rdata = test_done_i;
 
             // Debug
-            8'h50: reg_rsp_o.rdata = test_debug_words [0];
-            8'h54: reg_rsp_o.rdata = test_debug_words [1];
-            8'h58: reg_rsp_o.rdata = test_debug_words [2];
-            8'h5C: reg_rsp_o.rdata = test_debug_words [3];
-            8'h60: reg_rsp_o.rdata = test_debug_words [4];
-            8'h64: reg_rsp_o.rdata = test_debug_words [5];
+            8'h60: reg_rsp_o.rdata = test_debug_words [0];
+            8'h64: reg_rsp_o.rdata = test_debug_words [1];
+            8'h68: reg_rsp_o.rdata = test_debug_words [2];
+            8'h6C: reg_rsp_o.rdata = test_debug_words [3];
+            8'h70: reg_rsp_o.rdata = test_debug_words [4];
+            8'h74: reg_rsp_o.rdata = test_debug_words [5];
+
+            // 8'h50: reg_rsp_o.rdata = test_debug_words [0];
+            // 8'h54: reg_rsp_o.rdata = test_debug_words [1];
+            // 8'h58: reg_rsp_o.rdata = test_debug_words [2];
+            // 8'h5C: reg_rsp_o.rdata = test_debug_words [3];
+            // 8'h60: reg_rsp_o.rdata = test_debug_words [4];
+            // 8'h64: reg_rsp_o.rdata = test_debug_words [5];
+
+            8'h80: reg_rsp_o.rdata = test_cycle_count_i;
 
             default: reg_rsp_o.rdata = '0;
         endcase

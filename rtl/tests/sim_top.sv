@@ -37,6 +37,21 @@ always_ff @(posedge clk_i) begin
             slave[0].w_valid <= 0;
             end
 
+
+
+            40: begin
+            slave[0].aw_addr <= 32'h5000_0070;
+            slave[0].w_data  <= 32'h0000_0001;
+            
+            slave[0].aw_valid <= 1;
+            slave[0].w_valid <= 1;
+            end
+
+            41: begin
+            slave[0].aw_valid <= 0;
+            slave[0].w_valid <= 0;
+            end
+
             // 50: begin 
             // slave[0].aw_valid <= 1;
             // slave[0].w_valid <= 1;
