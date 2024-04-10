@@ -101,6 +101,7 @@ module axi_cgra_top #(
 
 
     logic [31:0] test_debug_words [5:0];
+    logic reset_state_machines;
 
 
     test_csr #(
@@ -119,7 +120,8 @@ module axi_cgra_top #(
         .data_output_size_o  ( data_output_size  ),
         .test_done_i ( test_done ),
         .execute_o ( test_execute ),
-        .test_debug_words(test_debug_words)
+        .test_debug_words(test_debug_words),
+        .reset_state_machines_o(reset_state_machines)
     );
 
     logic [32*INPUT_NODES_NUM-1:0] cgra_data_input_data;
@@ -132,7 +134,7 @@ module axi_cgra_top #(
 
     test_state_machines i_test_state_machines (
         .clk_i  (clk_i),
-        .rst_ni (rst_ni),
+        .rst_ni ( !(!rst_ni | reset_state_machines) ),
         .axi_master_port (axi_lite_bus),
 
         // Execute

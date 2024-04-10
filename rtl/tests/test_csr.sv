@@ -23,7 +23,8 @@ module test_csr #(
     output logic execute_o,
 
     // Test debug:
-    input  logic [31:0] test_debug_words [5:0]
+    input  logic [31:0] test_debug_words [5:0],
+    output logic reset_state_machines_o
 );
 
 // Register interface signals
@@ -154,9 +155,12 @@ module test_csr #(
                 // Control/status
                 8'h50: execute_o <= reg_req_i.wdata;
 
+                8'h70: reset_state_machines_o <= reg_req_i.wdata;
+
             endcase
             end else begin
                 execute_o <= 0;
+                reset_state_machines_o <= 0;
             end
         end
     end
