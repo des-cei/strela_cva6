@@ -97,8 +97,8 @@ module axi_cgra_top #(
     logic [31:0] data_output_addr [OUTPUT_NODES_NUM-1:0];
     logic [15:0] data_output_size [OUTPUT_NODES_NUM-1:0]; 
     logic test_done;
-    logic test_execute;
-
+    logic test_execute_input;
+    logic test_execute_output;
 
     logic [31:0] test_debug_words [5:0];
     logic reset_state_machines;
@@ -120,7 +120,8 @@ module axi_cgra_top #(
         .data_output_addr_o  ( data_output_addr  ),
         .data_output_size_o  ( data_output_size  ),
         .test_done_i ( test_done ),
-        .execute_o ( test_execute ),
+        .execute_input_o ( test_execute_input ),
+        .execute_output_o ( test_execute_output ),
         .test_cycle_count_i(test_cycle_count),
         .test_debug_words(test_debug_words),
         .reset_state_machines_o(reset_state_machines)
@@ -140,8 +141,8 @@ module axi_cgra_top #(
         .axi_master_port (axi_lite_bus),
 
         // Execute
-        .execute_input_i(test_execute),
-        .execute_output_i(test_execute),
+        .execute_input_i(test_execute_input),
+        .execute_output_i(test_execute_output),
 
         // CGRA input data signals
         .data_input_o        ( cgra_data_input_data ),

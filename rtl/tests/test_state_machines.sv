@@ -58,7 +58,7 @@ module test_state_machines #(
     output  logic [31:0] dbg_word5
 );
 
-    localparam MAX_OUTSTANDING = 4;
+    localparam MAX_OUTSTANDING = 6;
     localparam INPUT_FIFO_DEPTH = 10;
     localparam OUTPUT_FIFO_DEPTH = 10;
 
@@ -125,6 +125,51 @@ module test_state_machines #(
 
     // Reset signal for address offset after completed
     logic data_input_end_cycle_reset;
+
+
+    // ILA
+
+    // xlnx_ila ila_test (
+    //     .clk(clk_i),
+
+    //     .probe0(axi_master_port.ar_addr),
+    //     .probe1(axi_master_port.ar_valid),
+    //     .probe2(axi_master_port.ar_ready), 
+    //     .probe3(axi_master_port.r_data), 
+    //     .probe4(axi_master_port.r_resp),
+    //     .probe5(axi_master_port.r_valid),
+    //     .probe6(axi_master_port.r_ready),
+
+    //     .probe7(axi_master_port.aw_addr),
+    //     .probe8(axi_master_port.aw_valid),
+    //     .probe9(axi_master_port.aw_ready),
+    //     .probe10(axi_master_port.w_data),
+    //     .probe11(axi_master_port.w_strb),
+    //     .probe12(axi_master_port.w_valid), 
+    //     .probe13(axi_master_port.w_ready), 
+    //     .probe14(axi_master_port.b_resp),
+    //     .probe15(axi_master_port.b_valid),
+    //     .probe16(axi_master_port.b_ready),
+
+    //     .probe17(rst_ni),
+    //     .probe18(execute_input_i),
+    //     .probe19(data_input_execute_q),
+    //     .probe20(data_input_end_cycle_reset),
+    //     .probe21(execute_input_o),
+    //     .probe22(data_output_execute_q), 
+    //     .probe23(data_output_end_cycle_reset), 
+    //     .probe24(cycle_count_o),
+    //     .probe25(data_input_fifo_count[0]),
+    //     .probe26(data_input_fifo_count[1]),
+    //     .probe27(data_input_fifo_count[2]),
+    //     .probe28(data_input_fifo_count[3]),
+    //     .probe29(data_output_fifo_count[0]),
+    //     .probe30(data_output_fifo_count[1]),
+    //     .probe31(data_output_fifo_count[2]),
+    //     .probe32(data_output_fifo_count[3]), 
+    //     .probe33(op_a), 
+    //     .probe34(op_b)
+    // );
 
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -420,6 +465,8 @@ module test_state_machines #(
             cycle_count_d = 0;
         else if(!data_output_done_o)
             cycle_count_d = cycle_count_q + 1;
+        else
+            cycle_count_d = cycle_count_q;
         
         cycle_count_o = cycle_count_q;
     end

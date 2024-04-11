@@ -20,7 +20,8 @@ module test_csr #(
     output logic [15:0] data_output_size_o [OUTPUT_NODES_NUM-1:0],
 
     input  logic test_done_i,
-    output logic execute_o,
+    output logic execute_input_o,
+    output logic execute_output_o,
 
     // Test debug:
     input  logic [31:0] test_cycle_count_i,
@@ -103,13 +104,6 @@ module test_csr #(
             8'h70: reg_rsp_o.rdata = test_debug_words [4];
             8'h74: reg_rsp_o.rdata = test_debug_words [5];
 
-            // 8'h50: reg_rsp_o.rdata = test_debug_words [0];
-            // 8'h54: reg_rsp_o.rdata = test_debug_words [1];
-            // 8'h58: reg_rsp_o.rdata = test_debug_words [2];
-            // 8'h5C: reg_rsp_o.rdata = test_debug_words [3];
-            // 8'h60: reg_rsp_o.rdata = test_debug_words [4];
-            // 8'h64: reg_rsp_o.rdata = test_debug_words [5];
-
             8'h80: reg_rsp_o.rdata = test_cycle_count_i;
 
             default: reg_rsp_o.rdata = '0;
@@ -163,13 +157,14 @@ module test_csr #(
                 8'h4C: data_output_size_o[3] <= reg_req_i.wdata;
 
                 // Control/status
-                8'h50: execute_o <= reg_req_i.wdata;
+                8'h50: {execute_output_o, execute_input_o} <= reg_req_i.wdata[1:0];
 
                 8'h70: reset_state_machines_o <= reg_req_i.wdata;
 
             endcase
             end else begin
-                execute_o <= 0;
+                execute_input_o <= 0;
+                execute_output_o <= 0;
                 reset_state_machines_o <= 0;
             end
         end

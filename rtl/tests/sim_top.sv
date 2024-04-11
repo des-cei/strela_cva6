@@ -19,7 +19,7 @@ always_ff @(posedge clk_i) begin
 
             10: begin
             slave[0].aw_addr <= 32'h5000_0050;
-            slave[0].w_data  <= 32'h0000_0001;
+            slave[0].w_data  <= 32'h0000_0003;
             
             
             slave[0].aw_size <= 3'b011;
@@ -39,18 +39,18 @@ always_ff @(posedge clk_i) begin
 
 
 
-            40: begin
-            slave[0].aw_addr <= 32'h5000_0070;
-            slave[0].w_data  <= 32'h0000_0001;
+            // 40: begin
+            // slave[0].aw_addr <= 32'h5000_0070;
+            // slave[0].w_data  <= 32'h0000_0001;
             
-            slave[0].aw_valid <= 1;
-            slave[0].w_valid <= 1;
-            end
+            // slave[0].aw_valid <= 1;
+            // slave[0].w_valid <= 1;
+            // end
 
-            41: begin
-            slave[0].aw_valid <= 0;
-            slave[0].w_valid <= 0;
-            end
+            // 41: begin
+            // slave[0].aw_valid <= 0;
+            // slave[0].w_valid <= 0;
+            // end
 
             // 50: begin 
             // slave[0].aw_valid <= 1;
