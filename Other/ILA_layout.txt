@@ -41,18 +41,31 @@ AXI_Lite
 19: data_input_execute_q        (1)
 20: data_input_end_cycle_reset  (1)
 
-21: execute_input_o             (1)
+21: execute_output_i            (1)
 22: data_output_execute_q       (1)
 23: data_output_end_cycle_reset (1)
 
 24: cycle_count_o               (32)
 
-25: data_input_fifo_count[0]    (32)
-26: data_input_fifo_count[1]    (32)
-27: data_input_fifo_count[2]    (32)
-28: data_input_fifo_count[3]    (32)
+25: data_input_fifo_count[0]    (4)
+26: data_input_fifo_count[1]    (4)
+27: data_input_fifo_count[2]    (4)
+28: data_input_fifo_count[3]    (4)
 
-29: data_output_fifo_count[0]    (32)
-30: data_output_fifo_count[1]    (32)
-31: data_output_fifo_count[2]    (32)
-32: data_output_fifo_count[3]    (32)
+29: data_output_fifo_count[0]    (4)
+30: data_output_fifo_count[1]    (4)
+31: data_output_fifo_count[2]    (4)
+32: data_output_fifo_count[3]    (4)
+
+33: data_input_addr_offs_q[0]    (32)
+34: data_output_addr_offs_q[0]   (32)
+
+35: data_input_arb_request       (4)
+36: data_input_arb_grant_one_hot (4)
+37: input_outst_fifo_count       (4)
+
+38: data_output_arb_request       (4)
+39: data_output_arb_grant_one_hot (4)
+40: output_outst_fifo_count       (4)
+
+41: data_output_address_under_size (4)

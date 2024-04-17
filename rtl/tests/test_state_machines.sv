@@ -127,51 +127,6 @@ module test_state_machines #(
     logic data_input_end_cycle_reset;
 
 
-    // ILA
-
-    // xlnx_ila ila_test (
-    //     .clk(clk_i),
-
-    //     .probe0(axi_master_port.ar_addr),
-    //     .probe1(axi_master_port.ar_valid),
-    //     .probe2(axi_master_port.ar_ready), 
-    //     .probe3(axi_master_port.r_data), 
-    //     .probe4(axi_master_port.r_resp),
-    //     .probe5(axi_master_port.r_valid),
-    //     .probe6(axi_master_port.r_ready),
-
-    //     .probe7(axi_master_port.aw_addr),
-    //     .probe8(axi_master_port.aw_valid),
-    //     .probe9(axi_master_port.aw_ready),
-    //     .probe10(axi_master_port.w_data),
-    //     .probe11(axi_master_port.w_strb),
-    //     .probe12(axi_master_port.w_valid), 
-    //     .probe13(axi_master_port.w_ready), 
-    //     .probe14(axi_master_port.b_resp),
-    //     .probe15(axi_master_port.b_valid),
-    //     .probe16(axi_master_port.b_ready),
-
-    //     .probe17(rst_ni),
-    //     .probe18(execute_input_i),
-    //     .probe19(data_input_execute_q),
-    //     .probe20(data_input_end_cycle_reset),
-    //     .probe21(execute_input_o),
-    //     .probe22(data_output_execute_q), 
-    //     .probe23(data_output_end_cycle_reset), 
-    //     .probe24(cycle_count_o),
-    //     .probe25(data_input_fifo_count[0]),
-    //     .probe26(data_input_fifo_count[1]),
-    //     .probe27(data_input_fifo_count[2]),
-    //     .probe28(data_input_fifo_count[3]),
-    //     .probe29(data_output_fifo_count[0]),
-    //     .probe30(data_output_fifo_count[1]),
-    //     .probe31(data_output_fifo_count[2]),
-    //     .probe32(data_output_fifo_count[3]), 
-    //     .probe33(op_a), 
-    //     .probe34(op_b)
-    // );
-
-
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if(!rst_ni) begin
             data_input_execute_q <= 1'b0;
@@ -185,22 +140,6 @@ module test_state_machines #(
             data_input_addr_offs_q <= data_input_addr_offs_d;            
         end
 
-    end
-
-    // Debug
-    always_comb begin
-        dbg_word0[0] = data_input_execute_q;
-        dbg_word0[1] = wait_ar_q;
-
-        dbg_word0[2+3:2] = data_input_fifo_count[0];
-        dbg_word0[6+1:6] = input_outst_fifo_count;
-
-        dbg_word0[8] = ar_master_free;
-
-        dbg_word0[9] = data_input_arb_enable;
-
-        dbg_word1 = axi_read_adress_q;
-        dbg_word2 = data_input_addr_offs_q[0];
     end
 
     // Execute
@@ -425,24 +364,6 @@ module test_state_machines #(
 
     logic [OUTPUT_NODES_NUM-1:0] data_output_address_under_size;
 
-        // Debug
-    always_comb begin
-        dbg_word3[0] = data_output_execute_q;
-        dbg_word3[1] = wait_aw_q;
-
-        dbg_word3[2+3:2] = data_output_fifo_count[0];
-        dbg_word3[6+1:6] = output_outst_fifo_count;
-
-        dbg_word3[8] = aw_master_free;
-
-        dbg_word3[9] = data_output_arb_enable;
-
-        dbg_word3[10+4:10] = data_output_address_under_size;
-
-        dbg_word4 = axi_write_adress_q;
-        dbg_word5 = data_output_addr_offs_q[0];
-    end
-
     // Address comparators
     always_comb begin
         for(int i=0; i < OUTPUT_NODES_NUM; i++)
@@ -626,6 +547,57 @@ module test_state_machines #(
         .empty_o      ( output_outst_fifo_empty  )
     );
 
+
+    // // ILA
+
+    // xlnx_ila ila_test (
+    //     .clk(clk_i),
+
+    //     .probe0(axi_master_port.ar_addr),
+    //     .probe1(axi_master_port.ar_valid),
+    //     .probe2(axi_master_port.ar_ready), 
+    //     .probe3(axi_master_port.r_data), 
+    //     .probe4(axi_master_port.r_resp),
+    //     .probe5(axi_master_port.r_valid),
+    //     .probe6(axi_master_port.r_ready),
+
+    //     .probe7(axi_master_port.aw_addr),
+    //     .probe8(axi_master_port.aw_valid),
+    //     .probe9(axi_master_port.aw_ready),
+    //     .probe10(axi_master_port.w_data),
+    //     .probe11(axi_master_port.w_strb),
+    //     .probe12(axi_master_port.w_valid), 
+    //     .probe13(axi_master_port.w_ready), 
+    //     .probe14(axi_master_port.b_resp),
+    //     .probe15(axi_master_port.b_valid),
+    //     .probe16(axi_master_port.b_ready),
+
+    //     .probe17(rst_ni),
+    //     .probe18(execute_input_i),
+    //     .probe19(data_input_execute_q),
+    //     .probe20(data_input_end_cycle_reset),
+    //     .probe21(execute_output_i),
+    //     .probe22(data_output_execute_q), 
+    //     .probe23(data_output_end_cycle_reset), 
+    //     .probe24(cycle_count_o),
+    //     .probe25(data_input_fifo_count[0]),
+    //     .probe26(data_input_fifo_count[1]),
+    //     .probe27(data_input_fifo_count[2]),
+    //     .probe28(data_input_fifo_count[3]),
+    //     .probe29(data_output_fifo_count[0]),
+    //     .probe30(data_output_fifo_count[1]),
+    //     .probe31(data_output_fifo_count[2]),
+    //     .probe32(data_output_fifo_count[3]), 
+    //     .probe33(data_input_addr_offs_q[0]), 
+    //     .probe34(data_output_addr_offs_q[0]),
+    //     .probe35(data_input_arb_request),
+    //     .probe36(data_input_arb_grant_one_hot),
+    //     .probe37(input_outst_fifo_count),
+    //     .probe38(data_output_arb_request),
+    //     .probe39(data_output_arb_grant_one_hot),
+    //     .probe40(output_outst_fifo_count),
+    //     .probe41(data_output_address_under_size)
+    // );
 
 endmodule
 
