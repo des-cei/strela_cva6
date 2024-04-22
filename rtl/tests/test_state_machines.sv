@@ -26,8 +26,9 @@ module test_state_machines #(
     AXI_LITE.Master     axi_master_port,
 
     // Execute
-    input   logic execute_input_i,
+    input   logic execute_input_i,  // TODO: Might rename to "transfer" instead of "execute".
     input   logic execute_output_i,
+    input   logic execute_config_i,
 
     // CGRA input data signals
     output  logic [32*INPUT_NODES_NUM-1:0] data_input_o,
@@ -37,6 +38,14 @@ module test_state_machines #(
     input   logic [31:0] data_input_addr_i [INPUT_NODES_NUM-1:0],
     input   logic [15:0] data_input_size_i [INPUT_NODES_NUM-1:0],
     input   logic [15:0] data_input_stride_i [INPUT_NODES_NUM-1:0],
+
+    // CGRA config signals
+    output  logic [159:0] configuration_word_o,
+
+    input   logic [31:0] data_config_addr_i,
+    input   logic [15:0] data_config_size_i,
+
+    output  logic data_config_done_o,
 
     // CGRA output data signals
     input   logic [32*OUTPUT_NODES_NUM-1:0] data_output_i,
@@ -48,14 +57,9 @@ module test_state_machines #(
 
     output  logic data_output_done_o,
 
-    // Test
-    output  logic [31:0] cycle_count_o,
-    output  logic [31:0] dbg_word0,
-    output  logic [31:0] dbg_word1,
-    output  logic [31:0] dbg_word2,
-    output  logic [31:0] dbg_word3,
-    output  logic [31:0] dbg_word4,
-    output  logic [31:0] dbg_word5
+    // For stall cycle counters
+    output  logic input_outst_fifo_full_o,
+    output  logic output_outst_fifo_full_o
 );
 
     localparam INPUT_MAX_OUTSTANDING = 6;
@@ -63,9 +67,11 @@ module test_state_machines #(
     localparam INPUT_FIFO_DEPTH = 10;
     localparam OUTPUT_FIFO_DEPTH = 10;
 
+    localparam CONFIG_INDEX = INPUT_NODES_NUM-1 +1;
+
     typedef struct packed
     {
-        logic [INPUT_NODES_NUM-1:0] pe_one_hot;
+        logic [INPUT_NODES_NUM-1 +1:0] pe_one_hot; // MSB is for config
         logic odd_not_even_word;
     } trans_info_t;
 
@@ -82,21 +88,23 @@ module test_state_machines #(
 
 
     /*********************************************
-    *                INPUT DATA                  *
+    *            INPUT DATA & CONFIG             *
     **********************************************/
     // Execute
     logic data_input_execute_d, data_input_execute_q;
 
+    logic data_config_execute_d, data_config_execute_q;
+
     // Data input address calculation
-    logic [31:0] data_input_addr_offs_d [INPUT_NODES_NUM-1:0];
-    logic [31:0] data_input_addr_offs_q [INPUT_NODES_NUM-1:0];
+    logic [31:0] data_input_addr_offs_d [INPUT_NODES_NUM-1 +1:0]; // TODO: This can be less than 32 bits
+    logic [31:0] data_input_addr_offs_q [INPUT_NODES_NUM-1 +1:0]; // MSW is for config (+1)
 
     logic [31:0] axi_read_adress_d, axi_read_adress_q;
 
     // Data input arbitration
-    logic [INPUT_NODES_NUM-1:0] data_input_arb_request;
+    logic [INPUT_NODES_NUM-1 +1:0] data_input_arb_request;      // MSB is for config (+1)
     logic data_input_arb_enable;
-    logic [INPUT_NODES_NUM-1:0] data_input_arb_grant_one_hot;
+    logic [INPUT_NODES_NUM-1 +1:0] data_input_arb_grant_one_hot;// MSB is for config (+1)
 
     // AXI address read
     logic ar_master_free;
@@ -127,6 +135,14 @@ module test_state_machines #(
     // Reset signal for address offset after completed
     logic data_input_end_cycle_reset;
 
+    logic data_config_end_cycle_reset;
+
+
+    // Input config
+    logic input_config_enable_shift;
+    logic [31:0] input_config_data_in;
+    logic [159:0] input_config_configuration_word;
+
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if(!rst_ni) begin
@@ -136,6 +152,7 @@ module test_state_machines #(
             data_input_addr_offs_q <= '{default: '0};
         end else begin
             data_input_execute_q <= data_input_execute_d;
+            data_config_execute_q <= data_config_execute_d;
             wait_ar_q <= wait_ar_d;
             axi_read_adress_q <= axi_read_adress_d;
             data_input_addr_offs_q <= data_input_addr_offs_d;            
@@ -143,7 +160,7 @@ module test_state_machines #(
 
     end
 
-    // Execute
+    // Input Execute
     always_comb begin
         data_input_execute_d = data_input_execute_q;
         if(execute_input_i)
@@ -154,36 +171,63 @@ module test_state_machines #(
         data_input_end_cycle_reset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
     end
 
+    // Config Execute
+    always_comb begin
+        data_config_execute_d = data_config_execute_q;
+        if(execute_config_i)
+            data_config_execute_d = 1'b1;
+        else if (input_outst_fifo_empty)
+            data_config_execute_d = 1'b0;
+
+        data_config_end_cycle_reset = data_config_execute_q & !data_config_execute_d; // Active for one cycle
+
+        data_config_done_o =  !data_config_execute_q;
+    end
+
     // Read address arbitration
     always_comb begin
         // Request
         for(int i=0; i < INPUT_NODES_NUM; i++) begin
             data_input_arb_request[i] = (data_input_fifo_count[i] < (INPUT_FIFO_DEPTH - INPUT_MAX_OUTSTANDING)) &&
-                                        (data_input_addr_offs_q[i] < data_input_size_i[i]);
+                                        (data_input_addr_offs_q[i] < data_input_size_i[i]) && data_input_execute_d;  
         end
 
-        data_input_arb_enable = data_input_execute_d & ar_master_free & !input_outst_fifo_full;
+        data_input_arb_request[CONFIG_INDEX] = data_config_execute_d &&
+                                        (data_input_addr_offs_q[CONFIG_INDEX] < data_config_size_i); 
+
+        data_input_arb_enable = ar_master_free & !input_outst_fifo_full;
         new_ar_trans = (data_input_arb_grant_one_hot != 0);
 
         // Increment addresses
         axi_read_adress_d = axi_read_adress_q; 
         data_input_addr_offs_d = data_input_addr_offs_q;
 
-        for(int i=0; i<INPUT_NODES_NUM; i++) begin
+        for(int i=0; i<INPUT_NODES_NUM; i++) begin // TODO: This can be written not to imply priority
             if(data_input_arb_grant_one_hot[i]) begin
                 axi_read_adress_d = data_input_addr_offs_q[i] + data_input_addr_i[i];
                 data_input_addr_offs_d[i] = data_input_addr_offs_q[i] + data_input_stride_i[i];
             end
         end
 
+        if(data_input_arb_grant_one_hot[CONFIG_INDEX]) begin // Config address
+            axi_read_adress_d = data_input_addr_offs_q[CONFIG_INDEX] + data_config_addr_i;
+            data_input_addr_offs_d[CONFIG_INDEX] = data_input_addr_offs_q[CONFIG_INDEX] + 32'h4;
+        end
+
         if(data_input_end_cycle_reset)
-            data_input_addr_offs_d = '{default: '0};
+            data_input_addr_offs_d[INPUT_NODES_NUM-1:0] = '{default: '0};
+        
+        if(data_config_end_cycle_reset)
+            data_input_addr_offs_d[CONFIG_INDEX] = '0;
 
         
         // Save transaction in outstanding FIFO
         input_outst_fifo_in.pe_one_hot = data_input_arb_grant_one_hot;
         input_outst_fifo_in.odd_not_even_word = axi_read_adress_d[2]; // Even or odd 32 bit word for 64 bit access.
         input_outst_fifo_push = new_ar_trans;
+
+        // For stall cycle count
+        input_outst_fifo_full_o = input_outst_fifo_full;
     end
     
     // AXI read address
@@ -212,19 +256,22 @@ module test_state_machines #(
 
         axi_master_port.r_ready = 1'b1;
 
-        // All input FIFOs read from the same bus
+        // All input FIFOs (and config) read from the same bus
         axi_r_data_word = input_outst_fifo_out.odd_not_even_word ?
                     axi_master_port.r_data[63:32] : axi_master_port.r_data[31:0];
 
         for(int i=0; i<INPUT_NODES_NUM; i++)
             data_input_fifo_in[i] = axi_r_data_word;
+        input_config_data_in = axi_r_data_word;
 
         // Push to appropriate FIFO when new read data and pop outstanding
         if(axi_master_port.r_valid) begin
-            data_input_fifo_push = input_outst_fifo_out.pe_one_hot;
+            data_input_fifo_push = input_outst_fifo_out.pe_one_hot[INPUT_NODES_NUM-1:0];
+            input_config_enable_shift = input_outst_fifo_out.pe_one_hot[CONFIG_INDEX];
             input_outst_fifo_pop = 1'b1;
         end else begin
             data_input_fifo_push = '0;
+            input_config_enable_shift = 0;
             input_outst_fifo_pop = 1'b0;
         end
 
@@ -242,7 +289,7 @@ module test_state_machines #(
 
 
     round_robin_arbiter #(
-        .WIDTH(INPUT_NODES_NUM)
+        .WIDTH(INPUT_NODES_NUM +1) // MSB is for config
     ) i_data_input_arbiter (
         .clk_i(clk_i),
         .rst_ni(rst_ni),
@@ -291,6 +338,15 @@ module test_state_machines #(
         .empty_o      ( input_outst_fifo_empty  )
     );
 
+    // Shift register for configuration word
+    deserializer deserializer_i
+    (
+        .clk_i          (clk_i),
+        .rst_ni         (rst_ni),
+        .enable_i       (input_config_enable_shift),
+        .data_i         (input_config_data_in),
+        .kernel_config_o(configuration_word_o)
+    );
 
     /*********************************************
     *              OUTPUT DATA                   *
@@ -341,8 +397,6 @@ module test_state_machines #(
 
     logic data_output_end_cycle_reset;
 
-    logic [31:0] cycle_count_d, cycle_count_q;
-
 
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -352,13 +406,11 @@ module test_state_machines #(
             wait_aw_q <= 0;
             axi_write_adress_q <= '0;
             data_output_addr_offs_q <= '{default: '0};
-            cycle_count_q <= 0;
         end else begin
             data_output_execute_q <= data_output_execute_d;
             wait_aw_q <= wait_aw_d;
             axi_write_adress_q <= axi_write_adress_d;
-            data_output_addr_offs_q <= data_output_addr_offs_d;
-            cycle_count_q <= cycle_count_d;         
+            data_output_addr_offs_q <= data_output_addr_offs_d;        
         end
 
     end
@@ -382,15 +434,6 @@ module test_state_machines #(
         data_output_done_o =  !data_output_execute_q;
 
         data_output_end_cycle_reset = data_output_execute_q & !data_output_execute_d; // Active for one cycle
-
-        if(execute_output_i)
-            cycle_count_d = 0;
-        else if(!data_output_done_o)
-            cycle_count_d = cycle_count_q + 1;
-        else
-            cycle_count_d = cycle_count_q;
-        
-        cycle_count_o = cycle_count_q;
     end
 
     // Write address arbitration
@@ -422,6 +465,9 @@ module test_state_machines #(
         output_outst_fifo_in.pe_one_hot = data_output_arb_grant_one_hot;
         output_outst_fifo_in.odd_not_even_word = axi_write_adress_d[2]; // Even or odd 32 bit word for 64 bit access.
         output_outst_fifo_push = new_aw_trans;
+
+        // For stall cycle count
+        output_outst_fifo_full_o = output_outst_fifo_full;
     end
     
     // AXI write address

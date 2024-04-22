@@ -16,16 +16,19 @@ module test_csr #(
     output logic [15:0] data_input_size_o [INPUT_NODES_NUM-1:0],
     output logic [15:0] data_input_stride_o [INPUT_NODES_NUM-1:0],
 
+    output logic [31:0] data_config_addr_o,
+    output logic [15:0] data_config_size_o,
+
     output logic [31:0] data_output_addr_o [OUTPUT_NODES_NUM-1:0],
     output logic [15:0] data_output_size_o [OUTPUT_NODES_NUM-1:0],
 
-    input  logic test_done_i,
-    output logic execute_input_o,
-    output logic execute_output_o,
+    input  logic done_exec_output_i,
+    input  logic done_config_i,
+    output logic start_execution_o,
+    output logic load_configuration_o,
 
     // Test debug:
     input  logic [31:0] test_cycle_count_i,
-    input  logic [31:0] test_debug_words [5:0],
     output logic reset_state_machines_o
 );
 
@@ -57,6 +60,9 @@ module test_csr #(
     // Some registers
     logic [31:0] op_a;
     logic [31:0] op_b;
+
+
+    logic tmp_clear_bs;
 
 
     // Register read
@@ -94,17 +100,13 @@ module test_csr #(
             8'h4C: reg_rsp_o.rdata = data_output_size_o[3];
 
             // Control/status
-            8'h50: reg_rsp_o.rdata = test_done_i;
-
-            // Debug
-            8'h60: reg_rsp_o.rdata = test_debug_words [0];
-            8'h64: reg_rsp_o.rdata = test_debug_words [1];
-            8'h68: reg_rsp_o.rdata = test_debug_words [2];
-            8'h6C: reg_rsp_o.rdata = test_debug_words [3];
-            8'h70: reg_rsp_o.rdata = test_debug_words [4];
-            8'h74: reg_rsp_o.rdata = test_debug_words [5];
+            8'h50: reg_rsp_o.rdata = {done_config_i, done_exec_output_i};
 
             8'h80: reg_rsp_o.rdata = test_cycle_count_i;
+
+            // Config
+            8'h90: reg_rsp_o.rdata = data_config_addr_o;  
+            8'h94: reg_rsp_o.rdata = data_config_size_o;
 
             default: reg_rsp_o.rdata = '0;
         endcase
@@ -122,6 +124,9 @@ module test_csr #(
 
             data_output_addr_o <= '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050};
             data_output_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
+
+            data_config_addr_o <= 32'h90000000;
+            data_config_size_o <= 16'h14;
 
 
         end else begin
@@ -157,14 +162,19 @@ module test_csr #(
                 8'h4C: data_output_size_o[3] <= reg_req_i.wdata;
 
                 // Control/status
-                8'h50: {execute_output_o, execute_input_o} <= reg_req_i.wdata[1:0];
+                8'h50: {load_configuration_o, tmp_clear_bs, start_execution_o} <= reg_req_i.wdata[2:0];
 
                 8'h70: reset_state_machines_o <= reg_req_i.wdata;
 
+
+                // Config:
+                8'h90: data_config_addr_o <= reg_req_i.wdata;  
+                8'h94: data_config_size_o <= reg_req_i.wdata;
+
             endcase
             end else begin
-                execute_input_o <= 0;
-                execute_output_o <= 0;
+                start_execution_o <= 0;
+                load_configuration_o <= 0;
                 reset_state_machines_o <= 0;
             end
         end

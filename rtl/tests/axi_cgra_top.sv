@@ -94,13 +94,16 @@ module axi_cgra_top #(
     logic [31:0] data_input_addr [INPUT_NODES_NUM-1:0];
     logic [15:0] data_input_size [INPUT_NODES_NUM-1:0];
     logic [15:0] data_input_stride [INPUT_NODES_NUM-1:0];
+
+    logic [31:0] data_config_addr;
+    logic [15:0] data_config_size; 
+
     logic [31:0] data_output_addr [OUTPUT_NODES_NUM-1:0];
     logic [15:0] data_output_size [OUTPUT_NODES_NUM-1:0]; 
-    logic test_done;
-    logic test_execute_input;
-    logic test_execute_output;
+    logic done_exec, done_config;
+    logic csr_execute_input_output;
+    logic csr_load_config;
 
-    logic [31:0] test_debug_words [5:0];
     logic reset_state_machines;
     logic [31:0] test_cycle_count;
 
@@ -117,15 +120,50 @@ module axi_cgra_top #(
         .data_input_addr_o   ( data_input_addr   ),
         .data_input_size_o   ( data_input_size   ),
         .data_input_stride_o ( data_input_stride ),
+        .data_config_addr_o  ( data_config_addr  ),
+        .data_config_size_o  ( data_config_size  ),
         .data_output_addr_o  ( data_output_addr  ),
         .data_output_size_o  ( data_output_size  ),
-        .test_done_i ( test_done ),
-        .execute_input_o ( test_execute_input ),
-        .execute_output_o ( test_execute_output ),
+
+        .done_exec_output_i ( done_exec ),
+        .done_config_i ( done_config ),
+        .start_execution_o ( csr_execute_input_output ),
+        .load_configuration_o ( csr_load_config ),
         .test_cycle_count_i(test_cycle_count),
-        .test_debug_words(test_debug_words),
         .reset_state_machines_o(reset_state_machines)
     );
+
+
+    logic control_execute_config, control_execute_input, control_execute_output;
+    logic counters_read_stall, counters_write_stall;
+
+    countrol_unit i_control_unit(
+        // Clock and reset
+        .clk_i(clk_i),
+        .rst_ni(rst_ni),
+
+        // From CSR
+        .start_execution_i(csr_execute_input_output),
+        .load_configuration_i(csr_load_config),
+
+        // Control signals
+        .execute_config_o(control_execute_config),
+        .execute_input_o(control_execute_input),
+        .execute_output_o(control_execute_output),
+
+        // Input signals
+        .data_config_done_i(done_config),
+        .data_output_done_i(done_exec),
+
+        .data_read_stall_i(counters_read_stall),
+        .data_write_stall_i(counters_write_stall),
+
+        // Performance counters
+        .cycle_count_load_config_o(),
+        .cycle_count_execute_o(),
+        .cycle_count_stall_o()
+
+    ); 
 
     logic [32*INPUT_NODES_NUM-1:0] cgra_data_input_data;
     logic [INPUT_NODES_NUM-1:0] cgra_data_input_valid;
@@ -141,8 +179,9 @@ module axi_cgra_top #(
         .axi_master_port (axi_lite_bus),
 
         // Execute
-        .execute_input_i(test_execute_input),
-        .execute_output_i(test_execute_output),
+        .execute_input_i(control_execute_input),
+        .execute_output_i(control_execute_output),
+        .execute_config_i(control_execute_config),
 
         // CGRA input data signals
         .data_input_o        ( cgra_data_input_data ),
@@ -152,24 +191,23 @@ module axi_cgra_top #(
         .data_input_size_i   ( data_input_size ), // '{16'h8, 16'h8, 16'h8, 16'h8}
         .data_input_stride_i ( data_input_stride ), // '{16'h8, 16'h8, 16'h8, 16'h8}
 
+        // CGRA config data signals
+        .configuration_word_o(     ),
+        .data_config_addr_i  ( data_config_addr  ),
+        .data_config_size_i  ( data_config_size  ),
+        .data_config_done_o  ( done_config  ),
+
         // CGRA output data signals
         .data_output_i       ( cgra_data_output_data ),
         .data_output_valid_i ( cgra_data_output_valid ),
         .data_output_ready_o ( cgra_data_output_ready ),
         .data_output_addr_i  ( data_output_addr ), // '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050}
         .data_output_size_i  ( data_output_size ), // '{16'h04, 16'h04, 16'h04, 16'h04}
-        .data_output_done_o  ( test_done ),
+        .data_output_done_o  ( done_exec ),
 
-        // Test
-        .cycle_count_o(test_cycle_count),
-
-        .dbg_word0(test_debug_words[0]),
-        .dbg_word1(test_debug_words[1]),
-        .dbg_word2(test_debug_words[2]),
-        .dbg_word3(test_debug_words[3]),
-        .dbg_word4(test_debug_words[4]),
-        .dbg_word5(test_debug_words[5])
-
+        // For stall cycle calculation
+        .input_outst_fifo_full_o(counters_read_stall),
+        .output_outst_fifo_full_o(counters_write_stall)
     );
 
 

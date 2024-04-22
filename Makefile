@@ -45,6 +45,8 @@ verilator_srcs =  rtl/tests/sim_top.sv rtl/tests/test_ram_64.sv
 verilator_srcs += rtl/tests/axi_cgra_top.sv
 verilator_srcs += rtl/tests/test_csr.sv
 verilator_srcs += rtl/tests/test_state_machines.sv
+verilator_srcs += rtl/tests/deserializer.sv
+verilator_srcs += rtl/tests/control_unit.sv
 verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
 verilator_srcs += rtl/tests/mock_cgra.sv
 
