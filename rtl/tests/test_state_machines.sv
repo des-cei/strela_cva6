@@ -58,7 +58,8 @@ module test_state_machines #(
     output  logic [31:0] dbg_word5
 );
 
-    localparam MAX_OUTSTANDING = 6;
+    localparam INPUT_MAX_OUTSTANDING = 6;
+    localparam OUTPUT_MAX_OUTSTANDING = 6;
     localparam INPUT_FIFO_DEPTH = 10;
     localparam OUTPUT_FIFO_DEPTH = 10;
 
@@ -117,7 +118,7 @@ module test_state_machines #(
     // Input outstanding FIFO  
     trans_info_t input_outst_fifo_in;   
     logic input_outst_fifo_push;
-    logic [$clog2(MAX_OUTSTANDING)-1:0] input_outst_fifo_count;
+    logic [$clog2(INPUT_MAX_OUTSTANDING)-1:0] input_outst_fifo_count;
     trans_info_t input_outst_fifo_out;
     logic input_outst_fifo_pop;
     logic input_outst_fifo_empty;
@@ -157,7 +158,7 @@ module test_state_machines #(
     always_comb begin
         // Request
         for(int i=0; i < INPUT_NODES_NUM; i++) begin
-            data_input_arb_request[i] = (data_input_fifo_count[i] < (INPUT_FIFO_DEPTH - MAX_OUTSTANDING)) &&
+            data_input_arb_request[i] = (data_input_fifo_count[i] < (INPUT_FIFO_DEPTH - INPUT_MAX_OUTSTANDING)) &&
                                         (data_input_addr_offs_q[i] < data_input_size_i[i]);
         end
 
@@ -274,7 +275,7 @@ module test_state_machines #(
 
     // Input Outstanding transactions FIFO
     fifo_v3 #(
-        .DEPTH(MAX_OUTSTANDING),
+        .DEPTH(INPUT_MAX_OUTSTANDING),
         .dtype(trans_info_t)
     ) i_input_outstanding_fifo (
         .clk_i        ( clk_i                   ),
@@ -332,7 +333,7 @@ module test_state_machines #(
     // Output outstanding FIFO  
     trans_info_t output_outst_fifo_in;   
     logic output_outst_fifo_push;
-    logic [$clog2(MAX_OUTSTANDING)-1:0] output_outst_fifo_count;
+    logic [$clog2(OUTPUT_MAX_OUTSTANDING)-1:0] output_outst_fifo_count;
     trans_info_t output_outst_fifo_out;
     logic output_outst_fifo_pop;
     logic output_outst_fifo_empty;
@@ -531,7 +532,7 @@ module test_state_machines #(
 
     // Output outstanding transactions FIFO
     fifo_v3 #(
-        .DEPTH(MAX_OUTSTANDING),
+        .DEPTH(OUTPUT_MAX_OUTSTANDING),
         .dtype(trans_info_t)
     ) i_output_outstanding_fifo (
         .clk_i        ( clk_i                   ),
