@@ -12,38 +12,24 @@ TOP_MODULE = sim_top
 
 axi_src_dir = rtl/vendor/pulp-platform/axi/src
 
+############# Include dirs #############
 verilator_inc_dirs = $(axi_src_dir)/../include/ 	\
 					rtl/vendor/pulp-platform/common_cells/include
 
 verilator_inc_dirs += rtl/vendor/pulp-platform/register_interface/include
 
 
+############# Source packages #############
 verilator_src_pkgs = $(axi_src_dir)/axi_pkg.sv
-
-
-# Note: riscv_pkg.sv is included with Flist.cva6 in original makefile.
-
-# rtl/cva6_files/config_pkg.sv 
-# rtl/cva6_files/cv64a6_imafdc_sv39_config_pkg.sv 
-# rtl/cva6_files/riscv_pkg.sv	
-# rtl/cva6_files/ariane_pkg.sv
-
 verilator_src_pkgs += 	rtl/cva6_files/ariane_soc_pkg.sv \
 						rtl/vendor/pulp-platform/common_cells/src/cf_math_pkg.sv
 
-#$(filter %_pkg.sv, $(wildcard rtl/vendor/pulp-platform/common_cells/src/*.sv))
-					
 
-# rtl/tests/test_tb.sv
 
 ############# My sources ##############
 verilator_srcs =  rtl/tests/sim_top.sv
 
 verilator_srcs += rtl/tests/test_ram_64.sv
-
-# verilator_srcs += rtl/tests/axi_master.sv
-# verilator_srcs += rtl/tests/axi_master_test.sv
-# verilator_srcs += rtl/tests/axi_master_slave_test.sv
 
 verilator_srcs += rtl/tests/axi_cgra_top.sv
 verilator_srcs += rtl/tests/test_csr.sv
@@ -51,46 +37,42 @@ verilator_srcs += rtl/tests/test_state_machines.sv
 verilator_srcs += rtl/tests/deserializer.sv
 verilator_srcs += rtl/tests/control_unit.sv
 verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
+
+
 verilator_srcs += rtl/tests/mock_cgra.sv
 
 
+
+############# Vendor sources ###########
 verilator_srcs += rtl/vendor/pulp-platform/register_interface/src/reg_intf.sv
-#verilator_srcs += rtl/tests/axi_slave_test.sv
-
-
-verilator_srcs += 	rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv
-
-verilator_srcs +=	rtl/vendor/pulp-platform/axi2apb/src/axi2apb_64_32.sv \
-					rtl/vendor/pulp-platform/register_interface/src/apb_to_reg.sv
+verilator_srcs += rtl/vendor/pulp-platform/axi_mem_if/src/axi2mem.sv
+verilator_srcs += rtl/vendor/pulp-platform/axi2apb/src/axi2apb_64_32.sv \
+				  rtl/vendor/pulp-platform/register_interface/src/apb_to_reg.sv
 
 verilator_srcs  += 	$(wildcard rtl/vendor/pulp-platform/axi_slice/src/*.sv)
 
-############# AXI etc sources ###########
-verilator_srcs  +=	rtl/vendor/pulp-platform/common_cells/src/rstgen_bypass.sv                       \
-					rtl/vendor/pulp-platform/common_cells/src/rstgen.sv                              \
-					rtl/vendor/pulp-platform/common_cells/src/addr_decode.sv                         \
-					rtl/vendor/pulp-platform/common_cells/src/stream_register.sv                     \
-																								 	 \
-					rtl/vendor/pulp-platform/common_cells/src/cdc_2phase.sv                          \
-					rtl/vendor/pulp-platform/common_cells/src/spill_register_flushable.sv            \
-					rtl/vendor/pulp-platform/common_cells/src/spill_register.sv                      \
-					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv                  \
-					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv                  \
-					rtl/vendor/pulp-platform/common_cells/src/stream_delay.sv                        \
-					rtl/vendor/pulp-platform/common_cells/src/lfsr_16bit.sv                          \
+
+verilator_srcs  +=	rtl/vendor/pulp-platform/common_cells/src/rstgen_bypass.sv                  	\
+					rtl/vendor/pulp-platform/common_cells/src/rstgen.sv                         	\
+					rtl/vendor/pulp-platform/common_cells/src/addr_decode.sv                    	\
+					rtl/vendor/pulp-platform/common_cells/src/stream_register.sv                	\
+																									\
+					rtl/vendor/pulp-platform/common_cells/src/cdc_2phase.sv                     	\
+					rtl/vendor/pulp-platform/common_cells/src/spill_register_flushable.sv       	\
+					rtl/vendor/pulp-platform/common_cells/src/spill_register.sv                 	\
+					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv             	\
+					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv             	\
+					rtl/vendor/pulp-platform/common_cells/src/stream_delay.sv                   	\
+					rtl/vendor/pulp-platform/common_cells/src/lfsr_16bit.sv                     	\
 					\
-					rtl/vendor/pulp-platform/common_cells/src/delta_counter.sv \
-					rtl/vendor/pulp-platform/common_cells/src/rr_arb_tree.sv \
-					rtl/vendor/pulp-platform/common_cells/src/lzc.sv \
-					rtl/vendor/pulp-platform/common_cells/src/fifo_v3.sv \
-					rtl/vendor/pulp-platform/common_cells/src/addr_decode_dync.sv  \
+					rtl/vendor/pulp-platform/common_cells/src/delta_counter.sv						\
+					rtl/vendor/pulp-platform/common_cells/src/rr_arb_tree.sv 						\
+					rtl/vendor/pulp-platform/common_cells/src/lzc.sv 								\
+					rtl/vendor/pulp-platform/common_cells/src/fifo_v3.sv 							\
+					rtl/vendor/pulp-platform/common_cells/src/addr_decode_dync.sv  					\
 					rtl/vendor/pulp-platform/common_cells/src/counter.sv
 
 
-# $(filter-out %_pkg.sv, $(wildcard rtl/vendor/pulp-platform/common_cells/src/*.sv)) \
-# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv                  \
-# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv
-				 
 verilator_srcs += 	$(axi_src_dir)/axi_intf.sv									\
 					$(axi_src_dir)/axi_cut.sv                                 	\
 					$(axi_src_dir)/axi_join.sv                                	\
@@ -106,7 +88,7 @@ verilator_srcs += 	$(axi_src_dir)/axi_intf.sv									\
 
 
 
-
+############# Verilate command #############
 verilator_cpp_testbench = rtl/tests/counter_tb.cpp
 
 verilate_command = 	$(VERILATOR) --no-timing --assert
@@ -175,5 +157,6 @@ clean:
 
 
 
-
-
+# $(filter-out %_pkg.sv, $(wildcard rtl/vendor/pulp-platform/common_cells/src/*.sv)) \
+# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv                  \
+# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv
