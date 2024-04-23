@@ -125,17 +125,24 @@ module axi_cgra_top #(
         .data_output_addr_o  ( data_output_addr  ),
         .data_output_size_o  ( data_output_size  ),
 
-        .done_exec_output_i ( done_exec ),
-        .done_config_i ( done_config ),
-        .start_execution_o ( csr_execute_input_output ),
-        .load_configuration_o ( csr_load_config ),
-        .test_cycle_count_i(test_cycle_count),
-        .reset_state_machines_o(reset_state_machines)
+        .done_exec_output_i     ( done_exec             ),
+        .done_config_i          ( done_config           ),
+        .start_execution_o      ( csr_execute_input_output ),
+        .load_configuration_o   ( csr_load_config       ),
+
+        // Performance counters
+        .cycle_count_load_config_i  ( cycle_count_load_config   ),
+        .cycle_count_execute_i      ( cycle_count_execute       ),
+        .cycle_count_stall_i        ( cycle_count_stall         ),
+
+        .reset_state_machines_o ( reset_state_machines  )
     );
 
 
     logic control_execute_config, control_execute_input, control_execute_output;
     logic counters_read_stall, counters_write_stall;
+
+    logic [31:0] cycle_count_load_config, cycle_count_execute, cycle_count_stall;
 
     countrol_unit i_control_unit(
         // Clock and reset
@@ -159,9 +166,9 @@ module axi_cgra_top #(
         .data_write_stall_i(counters_write_stall),
 
         // Performance counters
-        .cycle_count_load_config_o(),
-        .cycle_count_execute_o(),
-        .cycle_count_stall_o()
+        .cycle_count_load_config_o  ( cycle_count_load_config   ),
+        .cycle_count_execute_o      ( cycle_count_execute       ),
+        .cycle_count_stall_o        ( cycle_count_stall         )
 
     ); 
 

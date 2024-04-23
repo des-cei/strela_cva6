@@ -17,26 +17,26 @@ always_ff @(posedge clk_i) begin
 
     case(count_q)
 
-            10: begin
-            // Start config
-            slave[0].aw_addr <= 32'h5000_0050;
-            slave[0].w_data  <= 32'h0000_0001;
+            // 10: begin
+            // // Start config
+            // slave[0].aw_addr <= 32'h5000_0050;
+            // slave[0].w_data  <= 32'h0000_0001;
             
             
-            slave[0].aw_size <= 3'b011;
-            slave[0].w_strb <= '1;
-            slave[0].w_last <= 1'b1;
+            // slave[0].aw_size <= 3'b011;
+            // slave[0].w_strb <= '1;
+            // slave[0].w_last <= 1'b1;
 
-            slave[0].aw_valid <= 1;
-            slave[0].w_valid <= 1;
+            // slave[0].aw_valid <= 1;
+            // slave[0].w_valid <= 1;
 
-            slave[0].b_ready <= 1;
-            end
+            // slave[0].b_ready <= 1;
+            // end
 
-            11: begin
-            slave[0].aw_valid <= 0;
-            slave[0].w_valid <= 0;
-            end
+            // 11: begin
+            // slave[0].aw_valid <= 0;
+            // slave[0].w_valid <= 0;
+            // end
 
 
             // 40: begin

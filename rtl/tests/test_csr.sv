@@ -8,8 +8,8 @@ module test_csr #(
     input  logic rst_ni,  // Asynchronous reset active low
     
     // Bus Interface
-    input  reg_req_t reg_req_i /*verilator public*/,
-    output reg_rsp_t reg_rsp_o /*verilator public*/,
+    input  reg_req_t reg_req_i,
+    output reg_rsp_t reg_rsp_o,
 
     // To memory
     output logic [31:0] data_input_addr_o [INPUT_NODES_NUM-1:0],
@@ -27,8 +27,12 @@ module test_csr #(
     output logic start_execution_o,
     output logic load_configuration_o,
 
+    input  logic cycle_count_load_config_i,
+    input  logic cycle_count_execute_i,
+    input  logic cycle_count_stall_i,
+
+
     // Test debug:
-    input  logic [31:0] test_cycle_count_i,
     output logic reset_state_machines_o
 );
 
@@ -44,8 +48,8 @@ module test_csr #(
 // reg_rsp_o.error
 // reg_rsp_o.ready
 
-    logic [7:0]     reg_addr;
-    logic           reg_we;
+    logic [7:0]     reg_addr /*verilator public*/;
+    logic           reg_we /*verilator public*/;
     
     assign reg_rsp_o.ready = 1'b1;
     assign reg_rsp_o.error = 1'b0;
@@ -53,9 +57,12 @@ module test_csr #(
     assign reg_addr = reg_req_i.addr;
     assign reg_we = reg_req_i.valid & reg_req_i.write;
 
-    // For monitoring in simulation
-    logic [31:0] reg_write_data;
+    // For easier monitoring in simulation
+    logic [31:0] reg_write_data /*verilator public*/;
     assign reg_write_data = reg_req_i.wdata;
+
+    logic [31:0] reg_read_data /*verilator public*/;
+    assign reg_rsp_o.rdata = reg_read_data;
 
     // Some registers
     logic [31:0] op_a;
@@ -69,46 +76,49 @@ module test_csr #(
     always_comb begin
         case(reg_addr)
             // Test
-            8'h00: reg_rsp_o.rdata = op_a;
-            8'h04: reg_rsp_o.rdata = op_b;
-            8'h08: reg_rsp_o.rdata = op_a + op_b;
-
-            // Input
-            8'h10: reg_rsp_o.rdata = data_input_addr_o[0];
-            8'h14: reg_rsp_o.rdata = {data_input_stride_o[0], data_input_size_o[0]};
-
-            8'h18: reg_rsp_o.rdata = data_input_addr_o[1];
-            8'h1C: reg_rsp_o.rdata = {data_input_stride_o[1], data_input_size_o[1]};
-
-            8'h20: reg_rsp_o.rdata = data_input_addr_o[2];
-            8'h24: reg_rsp_o.rdata = {data_input_stride_o[2], data_input_size_o[2]};
-
-            8'h28: reg_rsp_o.rdata = data_input_addr_o[3];
-            8'h2C: reg_rsp_o.rdata = {data_input_stride_o[3], data_input_size_o[3]};
-
-            // Output
-            8'h30: reg_rsp_o.rdata = data_output_addr_o[0];
-            8'h34: reg_rsp_o.rdata = data_output_size_o[0];
-
-            8'h38: reg_rsp_o.rdata = data_output_addr_o[1];
-            8'h3C: reg_rsp_o.rdata = data_output_size_o[1];
-
-            8'h40: reg_rsp_o.rdata = data_output_addr_o[2];
-            8'h44: reg_rsp_o.rdata = data_output_size_o[2];
-
-            8'h48: reg_rsp_o.rdata = data_output_addr_o[3];
-            8'h4C: reg_rsp_o.rdata = data_output_size_o[3];
+            8'hF0: reg_read_data = op_a;
+            8'hF4: reg_read_data = op_b;
+            8'hF8: reg_read_data = op_a + op_b;
 
             // Control/status
-            8'h50: reg_rsp_o.rdata = {done_config_i, done_exec_output_i};
-
-            8'h80: reg_rsp_o.rdata = test_cycle_count_i;
+            8'h00: reg_read_data = {done_config_i, done_exec_output_i};
 
             // Config
-            8'h90: reg_rsp_o.rdata = data_config_addr_o;  
-            8'h94: reg_rsp_o.rdata = data_config_size_o;
+            8'h04: reg_read_data = data_config_addr_o;  
+            8'h08: reg_read_data = data_config_size_o;
 
-            default: reg_rsp_o.rdata = '0;
+            // Input
+            8'h10: reg_read_data = data_input_addr_o[0];
+            8'h14: reg_read_data = {data_input_stride_o[0], data_input_size_o[0]};
+
+            8'h18: reg_read_data = data_input_addr_o[1];
+            8'h1C: reg_read_data = {data_input_stride_o[1], data_input_size_o[1]};
+
+            8'h20: reg_read_data = data_input_addr_o[2];
+            8'h24: reg_read_data = {data_input_stride_o[2], data_input_size_o[2]};
+
+            8'h28: reg_read_data = data_input_addr_o[3];
+            8'h2C: reg_read_data = {data_input_stride_o[3], data_input_size_o[3]};
+
+            // Output
+            8'h50: reg_read_data = data_output_addr_o[0];
+            8'h54: reg_read_data = data_output_size_o[0];
+
+            8'h58: reg_read_data = data_output_addr_o[1];
+            8'h5C: reg_read_data = data_output_size_o[1];
+
+            8'h60: reg_read_data = data_output_addr_o[2];
+            8'h64: reg_read_data = data_output_size_o[2];
+
+            8'h68: reg_read_data = data_output_addr_o[3];
+            8'h6C: reg_read_data = data_output_size_o[3];
+
+            // Performance counters
+            8'h90: reg_read_data = cycle_count_load_config_i;
+            8'h94: reg_read_data = cycle_count_execute_i;
+            8'h98: reg_read_data = cycle_count_stall_i;
+
+            default: reg_read_data = '0;
         endcase
     end
 
@@ -132,44 +142,48 @@ module test_csr #(
         end else begin
             if(reg_we) begin
             case(reg_addr)
-                8'h00: op_a <= reg_req_i.wdata;
-                8'h04: op_b <= reg_req_i.wdata;
 
-                // Input
-                8'h10: data_input_addr_o[0] <= reg_req_i.wdata;
-                8'h14: {data_input_stride_o[0], data_input_size_o[0]} <= reg_req_i.wdata;
-
-                8'h18: data_input_addr_o[1] <= reg_req_i.wdata;
-                8'h1C: {data_input_stride_o[1], data_input_size_o[1]} <= reg_req_i.wdata;
-
-                8'h20: data_input_addr_o[2] <= reg_req_i.wdata;
-                8'h24: {data_input_stride_o[2], data_input_size_o[2]} <= reg_req_i.wdata;
-
-                8'h28: data_input_addr_o[3] <= reg_req_i.wdata;
-                8'h2C: {data_input_stride_o[3], data_input_size_o[3]} <= reg_req_i.wdata;
-
-                // Output
-                8'h30: data_output_addr_o[0] <= reg_req_i.wdata;
-                8'h34: data_output_size_o[0] <= reg_req_i.wdata;
-
-                8'h38: data_output_addr_o[1] <= reg_req_i.wdata;
-                8'h3C: data_output_size_o[1] <= reg_req_i.wdata;
-
-                8'h40: data_output_addr_o[2] <= reg_req_i.wdata;
-                8'h44: data_output_size_o[2] <= reg_req_i.wdata;
-
-                8'h48: data_output_addr_o[3] <= reg_req_i.wdata;
-                8'h4C: data_output_size_o[3] <= reg_req_i.wdata;
+                // Test
+                8'hF0: op_a <= reg_write_data;
+                8'hF4: op_b <= reg_write_data;
+                8'hF8: reset_state_machines_o <= reg_write_data;
 
                 // Control/status
-                8'h50: {load_configuration_o, tmp_clear_bs, start_execution_o} <= reg_req_i.wdata[2:0];
-
-                8'h70: reset_state_machines_o <= reg_req_i.wdata;
+                8'h00: {load_configuration_o, tmp_clear_bs, start_execution_o} <= reg_write_data[2:0];
 
 
                 // Config:
-                8'h90: data_config_addr_o <= reg_req_i.wdata;  
-                8'h94: data_config_size_o <= reg_req_i.wdata;
+                8'h04: data_config_addr_o <= reg_write_data;  
+                8'h08: data_config_size_o <= reg_write_data;
+
+                // Input
+                8'h10: data_input_addr_o[0] <= reg_write_data;
+                8'h14: {data_input_stride_o[0], data_input_size_o[0]} <= reg_write_data;
+
+                8'h18: data_input_addr_o[1] <= reg_write_data;
+                8'h1C: {data_input_stride_o[1], data_input_size_o[1]} <= reg_write_data;
+
+                8'h20: data_input_addr_o[2] <= reg_write_data;
+                8'h24: {data_input_stride_o[2], data_input_size_o[2]} <= reg_write_data;
+
+                8'h28: data_input_addr_o[3] <= reg_write_data;
+                8'h2C: {data_input_stride_o[3], data_input_size_o[3]} <= reg_write_data;
+
+                // Output
+                8'h50: data_output_addr_o[0] <= reg_write_data;
+                8'h54: data_output_size_o[0] <= reg_write_data;
+
+                8'h58: data_output_addr_o[1] <= reg_write_data;
+                8'h5C: data_output_size_o[1] <= reg_write_data;
+
+                8'h60: data_output_addr_o[2] <= reg_write_data;
+                8'h64: data_output_size_o[2] <= reg_write_data;
+
+                8'h68: data_output_addr_o[3] <= reg_write_data;
+                8'h6C: data_output_size_o[3] <= reg_write_data;
+
+
+
 
             endcase
             end else begin
