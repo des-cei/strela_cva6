@@ -37,7 +37,10 @@ verilator_src_pkgs += 	rtl/cva6_files/ariane_soc_pkg.sv \
 # rtl/tests/test_tb.sv
 
 ############# My sources ##############
-verilator_srcs =  rtl/tests/sim_top.sv rtl/tests/test_ram_64.sv
+verilator_srcs =  rtl/tests/sim_top.sv
+
+verilator_srcs += rtl/tests/test_ram_64.sv
+
 # verilator_srcs += rtl/tests/axi_master.sv
 # verilator_srcs += rtl/tests/axi_master_test.sv
 # verilator_srcs += rtl/tests/axi_master_slave_test.sv

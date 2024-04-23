@@ -8,8 +8,8 @@ module test_csr #(
     input  logic rst_ni,  // Asynchronous reset active low
     
     // Bus Interface
-    input  reg_req_t reg_req_i,
-    output reg_rsp_t reg_rsp_o,
+    input  reg_req_t reg_req_i /*verilator public*/,
+    output reg_rsp_t reg_rsp_o /*verilator public*/,
 
     // To memory
     output logic [31:0] data_input_addr_o [INPUT_NODES_NUM-1:0],
@@ -122,7 +122,7 @@ module test_csr #(
             data_input_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
             data_input_stride_o <= '{16'h0, 16'h0, 16'h0, 16'h4};
 
-            data_output_addr_o <= '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050};
+            data_output_addr_o <= '{32'h9300005C,32'h92000058,32'h91000054,32'h90000100};
             data_output_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
 
             data_config_addr_o <= 32'h90000000;
