@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Wed Apr 24 11:05:17 2024
+[*] Wed Apr 24 11:14:53 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Wed Apr 24 10:58:52 2024"
-[dumpfile_size] 38574665
+[dumpfile_mtime] "Wed Apr 24 11:14:21 2024"
+[dumpfile_size] 38579349
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
 [size] 1850 1016
@@ -23,7 +23,7 @@
 [sst_width] 233
 [signals_width] 381
 [sst_expanded] 1
-[sst_vpaned_height] 444
+[sst_vpaned_height] 430
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni
@@ -68,7 +68,7 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_count[2:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_full
 @1000200
 -SM_Input
-@201
+@200
 -
 @c00200
 -Input_Data
@@ -126,6 +126,8 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_addr_offs_d[0][31:0
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_write_adress_q[31:0]
 @1000200
 -SM_Output
+@25
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.cycle_count_o[31:0]
 @200
 -
 -CGRA AXI Master

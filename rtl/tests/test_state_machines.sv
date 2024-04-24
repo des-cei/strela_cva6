@@ -397,7 +397,8 @@ module test_state_machines #(
 
     logic data_output_end_cycle_reset;
 
-
+    // For ILA:
+    logic [31:0] cycle_count_o;
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
 
@@ -435,6 +436,17 @@ module test_state_machines #(
 
         data_output_end_cycle_reset = data_output_execute_q & !data_output_execute_d; // Active for one cycle
     end
+
+    // Cycle counter to see on ILA
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+
+        if(!rst_ni || execute_output_i)
+            cycle_count_o <= '0;
+        else if(!data_output_done_o)
+            cycle_count_o <= cycle_count_o + 1;
+
+    end
+
 
     // Write address arbitration
     always_comb begin
