@@ -62,10 +62,10 @@ module test_state_machines #(
     output  logic output_outst_fifo_full_o
 );
 
-    localparam INPUT_MAX_OUTSTANDING = 6;
-    localparam OUTPUT_MAX_OUTSTANDING = 6;
-    localparam INPUT_FIFO_DEPTH = 10;
-    localparam OUTPUT_FIFO_DEPTH = 10;
+    localparam INPUT_MAX_OUTSTANDING = 10;
+    localparam OUTPUT_MAX_OUTSTANDING = 10;
+    localparam INPUT_FIFO_DEPTH = 20;
+    localparam OUTPUT_FIFO_DEPTH = 20;
 
     localparam CONFIG_INDEX = INPUT_NODES_NUM-1 +1;
 
@@ -90,6 +90,10 @@ module test_state_machines #(
     /*********************************************
     *            INPUT DATA & CONFIG             *
     **********************************************/
+    // NOTE: Some signals used for input, such as data_input_addr_offs_q, hold 
+    // address offsets for input data AND for config data, on its most significant
+    // position.
+
     // Execute
     logic data_input_execute_d, data_input_execute_q;
 
@@ -160,12 +164,23 @@ module test_state_machines #(
 
     end
 
+
+    logic [OUTPUT_NODES_NUM-1 +1:0] data_input_address_under_size;
+
+    // Address comparators
+    always_comb begin
+        for(int i=0; i < OUTPUT_NODES_NUM; i++)
+            data_input_address_under_size[i] = data_input_addr_offs_q[i] < data_input_size_i[i];
+        data_input_address_under_size[CONFIG_INDEX] = data_input_addr_offs_q[CONFIG_INDEX] < data_config_size_i;
+    end
+
+
     // Input Execute
     always_comb begin
         data_input_execute_d = data_input_execute_q;
         if(execute_input_i)
             data_input_execute_d = 1'b1;
-        else if (input_outst_fifo_empty)
+        else if (input_outst_fifo_empty && (data_input_address_under_size[CONFIG_INDEX] == 0))
             data_input_execute_d = 1'b0;
 
         data_input_end_cycle_reset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
@@ -176,7 +191,7 @@ module test_state_machines #(
         data_config_execute_d = data_config_execute_q;
         if(execute_config_i)
             data_config_execute_d = 1'b1;
-        else if (input_outst_fifo_empty)
+        else if (input_outst_fifo_empty && (data_input_address_under_size[INPUT_NODES_NUM-1:0]) == 0)
             data_config_execute_d = 1'b0;
 
         data_config_end_cycle_reset = data_config_execute_q & !data_config_execute_d; // Active for one cycle
@@ -189,11 +204,10 @@ module test_state_machines #(
         // Request
         for(int i=0; i < INPUT_NODES_NUM; i++) begin
             data_input_arb_request[i] = (data_input_fifo_count[i] < (INPUT_FIFO_DEPTH - INPUT_MAX_OUTSTANDING)) &&
-                                        (data_input_addr_offs_q[i] < data_input_size_i[i]) && data_input_execute_d;  
+                                        data_input_address_under_size[i] && data_input_execute_d;  
         end
 
-        data_input_arb_request[CONFIG_INDEX] = data_config_execute_d &&
-                                        (data_input_addr_offs_q[CONFIG_INDEX] < data_config_size_i); 
+        data_input_arb_request[CONFIG_INDEX] = data_config_execute_d && data_input_address_under_size[CONFIG_INDEX]; 
 
         data_input_arb_enable = ar_master_free & !input_outst_fifo_full;
         new_ar_trans = (data_input_arb_grant_one_hot != 0);
@@ -397,8 +411,8 @@ module test_state_machines #(
 
     logic data_output_end_cycle_reset;
 
-    // For ILA:
-    logic [31:0] cycle_count_o;
+    
+    logic [31:0] cycle_count_o; // For ILA
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
 
