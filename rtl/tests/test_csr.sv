@@ -31,9 +31,11 @@ module test_csr #(
     input  logic cycle_count_execute_i,
     input  logic cycle_count_stall_i,
 
-
+    output logic clear_cgra_o,
+    
     // Test debug:
     output logic reset_state_machines_o
+
 );
 
 // Register interface signals
@@ -68,8 +70,6 @@ module test_csr #(
     logic [31:0] op_a;
     logic [31:0] op_b;
 
-
-    logic tmp_clear_bs;
 
 
     // Register read
@@ -149,7 +149,7 @@ module test_csr #(
                 8'hF8: reset_state_machines_o <= reg_write_data;
 
                 // Control/status
-                8'h00: {load_configuration_o, tmp_clear_bs, start_execution_o} <= reg_write_data[2:0];
+                8'h00: {load_configuration_o, clear_cgra_o, start_execution_o} <= reg_write_data[2:0];
 
 
                 // Config:
@@ -189,6 +189,7 @@ module test_csr #(
             end else begin
                 start_execution_o <= 0;
                 load_configuration_o <= 0;
+                clear_cgra_o <= 0;
                 reset_state_machines_o <= 0;
             end
         end

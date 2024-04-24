@@ -107,6 +107,8 @@ module axi_cgra_top #(
     logic reset_state_machines;
     logic [31:0] test_cycle_count;
 
+    logic clear_cgra;
+
 
     test_csr #(
         .reg_req_t      ( regbus_req_t      ),
@@ -134,6 +136,8 @@ module axi_cgra_top #(
         .cycle_count_load_config_i  ( cycle_count_load_config   ),
         .cycle_count_execute_i      ( cycle_count_execute       ),
         .cycle_count_stall_i        ( cycle_count_stall         ),
+
+        .clear_cgra_o           ( clear_cgra ),
 
         .reset_state_machines_o ( reset_state_machines  )
     );
@@ -180,6 +184,8 @@ module axi_cgra_top #(
     logic [OUTPUT_NODES_NUM-1:0] cgra_data_output_valid;
     logic [OUTPUT_NODES_NUM-1:0] cgra_data_output_ready;
 
+    logic [159:0] configuration_word;
+
     test_state_machines i_test_state_machines (
         .clk_i  (clk_i),
         .rst_ni ( !(!rst_ni | reset_state_machines) ),
@@ -199,7 +205,7 @@ module axi_cgra_top #(
         .data_input_stride_i ( data_input_stride ), // '{16'h8, 16'h8, 16'h8, 16'h8}
 
         // CGRA config data signals
-        .configuration_word_o(     ),
+        .configuration_word_o( configuration_word ),
         .data_config_addr_i  ( data_config_addr  ),
         .data_config_size_i  ( data_config_size  ),
         .data_config_done_o  ( done_config  ),
@@ -224,22 +230,22 @@ module axi_cgra_top #(
 
  
 
-
-    mock_CGRA cgra_i
+    // Alternative: mock_CGRA
+    CGRA cgra_i
     (
         .clk                ( clk_i ),
-        .rst_n              (  ),
-        .clk_bs             (  ),
-        .rst_n_bs           (  ),
+        .rst_n              ( !(!rst_ni | clear_cgra) ), // Reset internal state
+        .clk_bs             ( clk_i ),
+        .rst_n_bs           ( !(!rst_ni | clear_cgra) ), // Reset configuration
         .data_in            ( cgra_data_input_data   ),
         .data_in_valid      ( cgra_data_input_valid  ),
         .data_in_ready      ( cgra_data_input_ready  ),
         .data_out           ( cgra_data_output_data  ),
         .data_out_valid     ( cgra_data_output_valid ),
         .data_out_ready     ( cgra_data_output_ready ),
-        .config_bitstream   (  ),
-        .bitstream_enable_i (  ),
-        .execute_i          (  )
+        .config_bitstream   ( configuration_word ),
+        .bitstream_enable_i ( 1'b1 ),
+        .execute_i          ( !done_exec )
     );
 
 endmodule

@@ -15,9 +15,11 @@
 
 // Register addresses
 #include "register_addresses.h"
+#include "kernels.h"
 
 vluint64_t sim_time = 0;
 
+////////////// Functions to read and write config registers and RAM from this testbench ///////////
 
 // To be called before rising edge of the clock
 void write_reg(Vsim_top *dut, uint32_t reg_addr, uint32_t reg_data)
@@ -26,7 +28,6 @@ void write_reg(Vsim_top *dut, uint32_t reg_addr, uint32_t reg_data)
     dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_write_data = reg_data;
     dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_we = 1;
 }
-
 
 void write_reg_eval(Vsim_top *dut, VerilatedVcdC *m_trace, uint32_t reg_addr, uint32_t reg_data)
 {
@@ -37,13 +38,43 @@ void write_reg_eval(Vsim_top *dut, VerilatedVcdC *m_trace, uint32_t reg_addr, ui
     dut->clk_i = 1;  dut->eval();  m_trace->dump(sim_time++);
 }
 
-
 uint32_t read_reg(Vsim_top *dut, uint32_t reg_addr)
 {
     dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_addr = reg_addr;
     dut->eval();
     return dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_read_data;
 }
+
+
+#define RAM_CONTENTS dut->sim_top->i_test_ram->ram_memory_contents
+
+uint64_t read_ram(Vsim_top *dut, uint32_t ram_addr)
+{
+    return dut->sim_top->i_test_ram->ram_memory_contents[(ram_addr & 0xffff)/8];
+}
+
+void write_ram(Vsim_top *dut, uint32_t ram_addr, uint64_t ram_data)
+{
+    dut->sim_top->i_test_ram->ram_memory_contents[(ram_addr & 0xffff)/8] = ram_data;
+}
+
+void examine_mem(Vsim_top *dut, uint32_t ram_addr1, uint32_t ram_addr2)
+{
+    for(int i=ram_addr1; i<ram_addr2; i+=8)
+    {
+ 
+        uint32_t high = read_ram(dut, i) >> 32;
+        uint32_t low  = read_ram(dut, i) & 0x00000000ffffffff;
+
+        printf("%08x: %08x %08x\n", i, low, high);
+        if((i/8+1)%4 == 0)
+            printf("\n");
+    }
+}
+
+
+
+
 
 int main(int argc, char** argv, char** env) {
 
@@ -56,14 +87,34 @@ int main(int argc, char** argv, char** env) {
     dut->trace(m_trace, 99);
     m_trace->open("waveform.vcd");
 
-    //
-    for(int i=0; i<10; i++)
+
+    ////////////// MEMORY SETUP ///////////////////
+
+    #define CONFIG_ADDR     0x80000000
+    #define DATA_IN_ADDR    0x80001000
+    #define DATA_OUT_ADDR   0x80002000
+
+
+    // Copy bitstream to RAM
+
+    uint32_t *cgra_kernel = bypass_kernel;
+    uint32_t cgra_kernel_size = BYPASS_SIZE;
+
+    for(int i=0; i<cgra_kernel_size; i+=2)
     {
-        dut->sim_top->i_test_ram->ram_memory_contents[i] = 0xa0000000b0000000 + 0x0000000100000001*i;
+        write_ram(dut, CONFIG_ADDR + i*4, \
+                    ((uint64_t)cgra_kernel[i+1] << 32) | cgra_kernel[i]);
     }
 
-    //
 
+    // Setup Input data
+    for(int i = 0; i<100; i++)
+    {
+        write_ram(dut, DATA_IN_ADDR + i*8, 0xa0000000b0000000 + 0x0000000100000001*i);
+    }
+
+
+    /////////////// SIMULATION LOOP ////////////////
     dut->rst_ni = 0;
     while (!contextp->gotFinish()) {
         dut->clk_i = 0;  dut->eval();  m_trace->dump(sim_time++);
@@ -74,52 +125,64 @@ int main(int argc, char** argv, char** env) {
 
         if(sim_time == 10)
         {
-            // write_reg_eval(dut, m_trace, CG_CONTROL_STATUS_A, CG_CONTROL_STATUS_BIT_START_EXEC);
-            write_reg_eval(dut, m_trace, CG_CONTROL_STATUS_A, CG_CONTROL_STATUS_BIT_LOAD_CONFIG);
+            // Load configuration
+            write_reg_eval(dut, m_trace, CGRA_CONF_ADDR_A, CONFIG_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_CONF_SIZE_A, cgra_kernel_size*4);
+            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_LOAD_CONFIG);
         }
 
-        if(sim_time == 100)
+        if(sim_time == 500)
         {
-            write_reg_eval(dut, m_trace, CG_IN_ADDR0_A, 0xa0001111);
-            write_reg_eval(dut, m_trace, CG_IN_ADDR1_A, 0xb0002222);
+            write_reg_eval(dut, m_trace, CGRA_IN0_ADDR_A, DATA_IN_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0x4 << 16 | 0x20);
+
+            write_reg_eval(dut, m_trace, CGRA_OUT0_ADDR_A, DATA_OUT_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_OUT0_SIZE_A, 0x20);
+
+            write_reg_eval(dut, m_trace, CGRA_IN1_ADDR_A, DATA_IN_ADDR+0x30);
+            write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0x4 << 16 | 0x20);
+
+            write_reg_eval(dut, m_trace, CGRA_OUT1_ADDR_A, DATA_OUT_ADDR+0x30);
+            write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0x20);
+
+            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
+        }
+
+        if(sim_time == 700)
+        {
+            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_LOAD_CONFIG);
+        }
+
+        if(sim_time == 1100)
+        {
+            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
         }
             
 
     }
 
 
-    dut->clk_i = 0;
-    dut->eval();
 
-    // write_reg(dut, 0x14, 0xdead1234);
+    printf("\nCONFIG MEM\n");
+    examine_mem(dut, CONFIG_ADDR, CONFIG_ADDR + 0x50);
 
-    dut->clk_i = 1;
-    dut->eval();
+    printf("\nINPUT MEM\n");
+    examine_mem(dut, DATA_IN_ADDR, DATA_IN_ADDR + 0x50);
 
+    printf("\nOUTPUT MEM\n");
+    examine_mem(dut, DATA_OUT_ADDR, DATA_OUT_ADDR + 0x50);
 
-    // dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_addr = 0x14; // reg_we, reg_write_data, reg_read_data
-    // dut->eval();
-    // printf("DATA: %x \n", dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_read_data);
+    // for(int i=; i<20; i++)
+    // {
 
+    //     uint32_t high = (RAM_CONTENTS[base_addr + i]) >> 32;
+    //     uint32_t low = RAM_CONTENTS[base_addr + i] & 0x00000000ffffffff;
 
-    printf("DATA: %x \n", read_reg(dut, 0x10));
+    //     printf("%08x: %08x %08x\n", 8*i, low, high);
+    //     if((i+1)%4 == 0)
+    //         printf("\n");
+    // }
 
-
-
-    printf("MEMORY CONTENTS\n");
-
-
-
-
-    for(int i=0; i<2; i++)
-    {
-        uint32_t high = (dut->sim_top->i_test_ram->ram_memory_contents[i]) >> 32;
-        uint32_t low = dut->sim_top->i_test_ram->ram_memory_contents[i] & 0x00000000ffffffff;
-
-        printf("%08x: %08x %08x\n", 8*i, high, low);
-        if((i+1)%4 == 0)
-            printf("\n");
-    }
 
 
     m_trace->close();

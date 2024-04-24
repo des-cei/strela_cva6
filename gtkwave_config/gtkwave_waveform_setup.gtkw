@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Mon Apr 22 18:04:54 2024
+[*] Wed Apr 24 11:05:17 2024
 [*]
 [dumpfile] "/home/juangranja/Documents/strela_cva6/waveform.vcd"
-[dumpfile_mtime] "Mon Apr 22 18:03:50 2024"
-[dumpfile_size] 7858362
+[dumpfile_mtime] "Wed Apr 24 10:58:52 2024"
+[dumpfile_size] 38574665
 [savefile] "/home/juangranja/Documents/strela_cva6/gtkwave_config/gtkwave_waveform_setup.gtkw"
 [timestart] 0
 [size] 1850 1016
 [pos] 0 189
-*-6.005540 25 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-7.005540 531 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.sim_top.
 [treeopen] TOP.sim_top.i_axi_cgra_top.
@@ -20,75 +20,60 @@
 [treeopen] TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifos[0].
 [treeopen] TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifos[1].
 [treeopen] TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifos[3].
-[sst_width] 413
-[signals_width] 462
+[sst_width] 233
+[signals_width] 381
 [sst_expanded] 1
-[sst_vpaned_height] 321
+[sst_vpaned_height] 444
 @28
 TOP.sim_top.clk_i
 TOP.sim_top.rst_ni
 @200
 -
-@24
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.cycle_count_o[31:0]
+-CGRA
+@28
+TOP.sim_top.i_axi_cgra_top.cgra_i.PE_0.catch_config
+TOP.sim_top.i_axi_cgra_top.cgra_i.catch_config[15:0]
 @22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifo_count[0][3:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_addr_offs_q[0][31:0]
+TOP.sim_top.i_axi_cgra_top.cgra_i.PE_0.config_reg[143:0]
 @200
 -
--Load Config
-@201
--
-@24
-TOP.sim_top.i_axi_cgra_top.i_control_unit.cycle_count_execute_o[31:0]
+-Config, Input & Output data
+@800200
+-Load_Config
 @28
-TOP.sim_top.i_axi_cgra_top.i_control_unit.load_configuration_q
-@22
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_config_execute_q
+@24
 TOP.sim_top.i_axi_cgra_top.i_control_unit.cycle_count_load_config_o[31:0]
+@22
 TOP.sim_top.i_axi_cgra_top.i_test_reg_interface.data_config_addr_o[31:0]
 TOP.sim_top.i_axi_cgra_top.i_test_reg_interface.data_config_size_o[15:0]
-@28
-TOP.sim_top.i_axi_cgra_top.i_control_unit.execute_config_o
-@200
--
-@28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_config_execute_d
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_config_execute_q
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_empty
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_enable
-@22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_grant_one_hot[4:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_request[4:0]
-@200
--
-@22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_read_adress_q[31:0]
-@200
--
-@22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_config_data_in[31:0]
-@28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_config_enable_shift
-@22
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.configuration_word_o[159:0]
+@1000200
+-Load_Config
 @200
 -
--
--State machines
 @800200
 -SM_Input
+@22
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_addr_offs_q[0][31:0]
 @28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.execute_input_i
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.execute_output_i
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_execute_d
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_execute_q
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_end_cycle_reset
-@200
--
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_enable
+@22
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_request[4:0]
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_arb_grant_one_hot[4:0]
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_read_adress_q[31:0]
+@24
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_count[2:0]
 @28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_full
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.ar_master_free
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.new_ar_trans
+@1000200
+-SM_Input
+@201
+-
+@c00200
+-Input_Data
+@28
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_execute_q
 @c00200
 -In_FIFO_count
 @22
@@ -98,27 +83,26 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifo_count[2][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifo_count[3][3:0]
 @1401200
 -In_FIFO_count
-@28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.input_outst_fifo_empty
-@1000200
--SM_Input
-@28
-TOP.sim_top.clk_i
-@c00200
+-Input_Data
+@24
+TOP.sim_top.i_axi_cgra_top.i_control_unit.cycle_count_stall_o[31:0]
+@800200
 -SM_Output
+@24
+TOP.sim_top.i_axi_cgra_top.i_control_unit.cycle_count_execute_o[31:0]
 @28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.execute_output_i
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_execute_d
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_execute_q
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_done_o
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_end_cycle_reset
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_execute_q
 @200
 -
 @28
+TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_enable
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_request[3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_arb_grant_one_hot[3:0]
 @200
 -
+@c00200
+-Out_FIFO_count
 @28
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_address_under_size[3:0]
 @22
@@ -126,32 +110,28 @@ TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_unsent_count[0
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_unsent_count[1][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_unsent_count[2][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_unsent_count[3][3:0]
-@800200
--Out_FIFO_count
+@200
+-
 @22
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_count[0][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_count[1][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_count[2][3:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_fifo_count[3][3:0]
-@1000200
+@1401200
 -Out_FIFO_count
 @200
 -
 @22
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_addr_offs_d[0][31:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_write_adress_d[31:0]
 TOP.sim_top.i_axi_cgra_top.i_test_state_machines.axi_write_adress_q[31:0]
-@28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.aw_master_free
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.new_aw_trans
-@1401200
+@1000200
 -SM_Output
 @200
 -
 -CGRA AXI Master
 @28
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_output_done_o
-@800200
+TOP.sim_top.clk_i
+@c00200
 -AXI_AR
 @22
 TOP.sim_top.slave[2].ar_addr[63:0]
@@ -164,9 +144,9 @@ TOP.sim_top.slave[2].ar_prot[2:0]
 TOP.sim_top.slave[2].ar_size[2:0]
 TOP.sim_top.slave[2].ar_valid
 TOP.sim_top.slave[2].ar_ready
-@1000200
+@1401200
 -AXI_AR
-@800200
+@c00200
 -AXI_R
 @22
 TOP.sim_top.slave[2].r_data[63:0]
@@ -176,7 +156,7 @@ TOP.sim_top.slave[2].r_resp[1:0]
 TOP.sim_top.slave[2].r_last
 TOP.sim_top.slave[2].r_valid
 TOP.sim_top.slave[2].r_ready
-@1000200
+@1401200
 -AXI_R
 @c00200
 -AXI_AW
@@ -272,7 +252,7 @@ TOP.sim_top.slave[2].w_ready
 @200
 -
 -RAM
-@800200
+@c00200
 -RAM
 @22
 TOP.sim_top.i_test_ram.addr_i[63:0]
@@ -283,13 +263,7 @@ TOP.sim_top.i_test_ram.req_i
 TOP.sim_top.i_test_ram.wdata_i[63:0]
 @28
 TOP.sim_top.i_test_ram.we_i
-@1000200
+@1401200
 -RAM
-@22
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifos[0].i_data_input_fifo.mem_n[319:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifos[1].i_data_input_fifo.mem_q[319:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifos[2].i_data_input_fifo.mem_q[319:0]
-TOP.sim_top.i_axi_cgra_top.i_test_state_machines.data_input_fifos[3].i_data_input_fifo.mem_q[319:0]
-TOP.sim_top.i_test_ram.mem[1279:0]
 [pattern_trace] 1
 [pattern_trace] 0

@@ -24,6 +24,8 @@ verilator_src_pkgs = $(axi_src_dir)/axi_pkg.sv
 verilator_src_pkgs += 	rtl/cva6_files/ariane_soc_pkg.sv \
 						rtl/vendor/pulp-platform/common_cells/src/cf_math_pkg.sv
 
+verilator_src_pkgs +=	rtl/strela/rtl/include/cgra_pkg.sv
+
 
 
 ############# My sources ##############
@@ -40,6 +42,12 @@ verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
 
 
 verilator_srcs += rtl/tests/mock_cgra.sv
+
+
+############# Strela CGRA sources #############
+verilator_srcs += 	$(wildcard rtl/strela/rtl/cgra/*.sv)
+# verilator_srcs +=	rtl/strela/sim/cgra_clock_gate.sv
+
 
 
 

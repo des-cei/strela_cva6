@@ -101,7 +101,7 @@ always_ff @(posedge clk_i) begin
 
 
         
-        500: $finish;
+        1000: $finish;
     endcase
 end
 

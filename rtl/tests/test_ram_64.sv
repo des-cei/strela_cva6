@@ -15,7 +15,7 @@
 
 // Auto-generated code
 module test_ram_64 #(
-    parameter RAM_SIZE = 200
+    parameter RAM_SIZE = 65536
 )(
    input  logic         clk_i,
    input  logic         req_i,
