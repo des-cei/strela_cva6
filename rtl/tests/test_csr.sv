@@ -27,9 +27,9 @@ module test_csr #(
     output logic start_execution_o,
     output logic load_configuration_o,
 
-    input  logic cycle_count_load_config_i,
-    input  logic cycle_count_execute_i,
-    input  logic cycle_count_stall_i,
+    input  logic [31:0] cycle_count_load_config_i,
+    input  logic [31:0] cycle_count_execute_i,
+    input  logic [31:0] cycle_count_stall_i,
 
     output logic clear_cgra_o,
     
