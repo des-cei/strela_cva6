@@ -180,7 +180,7 @@ module test_state_machines #(
         data_input_execute_d = data_input_execute_q;
         if(execute_input_i)
             data_input_execute_d = 1'b1;
-        else if (input_outst_fifo_empty && (data_input_address_under_size[CONFIG_INDEX] == 0))
+        else if (input_outst_fifo_empty && (data_input_address_under_size[INPUT_NODES_NUM-1:0] == 0))
             data_input_execute_d = 1'b0;
 
         data_input_end_cycle_reset = data_input_execute_q & !data_input_execute_d; // Active for one cycle
@@ -191,7 +191,7 @@ module test_state_machines #(
         data_config_execute_d = data_config_execute_q;
         if(execute_config_i)
             data_config_execute_d = 1'b1;
-        else if (input_outst_fifo_empty && (data_input_address_under_size[INPUT_NODES_NUM-1:0]) == 0)
+        else if (input_outst_fifo_empty && (data_input_address_under_size[CONFIG_INDEX]) == 0)
             data_config_execute_d = 1'b0;
 
         data_config_end_cycle_reset = data_config_execute_q & !data_config_execute_d; // Active for one cycle
