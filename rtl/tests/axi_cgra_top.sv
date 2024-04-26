@@ -107,7 +107,7 @@ module axi_cgra_top #(
     logic reset_state_machines;
     logic [31:0] test_cycle_count;
 
-    logic clear_cgra;
+    logic clear_cgra_config, clear_cgra_state;
 
 
     test_csr #(
@@ -137,7 +137,8 @@ module axi_cgra_top #(
         .cycle_count_execute_i      ( cycle_count_execute       ),
         .cycle_count_stall_i        ( cycle_count_stall         ),
 
-        .clear_cgra_o           ( clear_cgra ),
+        .clear_cgra_config_o          ( clear_cgra_config ),
+        .clear_cgra_state_o           ( clear_cgra_state ),
 
         .reset_state_machines_o ( reset_state_machines  )
     );
@@ -234,9 +235,9 @@ module axi_cgra_top #(
     CGRA cgra_i
     (
         .clk                ( clk_i ),
-        .rst_n              ( !(!rst_ni | clear_cgra) ), // Reset internal state
+        .rst_n              ( !(!rst_ni | clear_cgra_state) ), // Reset internal state
         .clk_bs             ( clk_i ),
-        .rst_n_bs           ( !(!rst_ni | clear_cgra) ), // Reset configuration
+        .rst_n_bs           ( !(!rst_ni | clear_cgra_config) ), // Reset configuration
         .data_in            ( cgra_data_input_data   ),
         .data_in_valid      ( cgra_data_input_valid  ),
         .data_in_ready      ( cgra_data_input_ready  ),

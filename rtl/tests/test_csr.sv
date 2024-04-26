@@ -31,7 +31,8 @@ module test_csr #(
     input  logic [31:0] cycle_count_execute_i,
     input  logic [31:0] cycle_count_stall_i,
 
-    output logic clear_cgra_o,
+    output logic clear_cgra_config_o,
+    output logic clear_cgra_state_o,
     
     // Test debug:
     output logic reset_state_machines_o
@@ -149,7 +150,7 @@ module test_csr #(
                 8'hF8: reset_state_machines_o <= reg_write_data;
 
                 // Control/status
-                8'h00: {load_configuration_o, clear_cgra_o, start_execution_o} <= reg_write_data[2:0];
+                8'h00: {clear_cgra_config_o, load_configuration_o, clear_cgra_state_o, start_execution_o} <= reg_write_data[3:0];
 
 
                 // Config:
@@ -189,7 +190,8 @@ module test_csr #(
             end else begin
                 start_execution_o <= 0;
                 load_configuration_o <= 0;
-                clear_cgra_o <= 0;
+                clear_cgra_config_o <= 0;
+                clear_cgra_state_o <= 0;
                 reset_state_machines_o <= 0;
             end
         end

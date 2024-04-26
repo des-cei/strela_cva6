@@ -2,7 +2,10 @@
 
 #define CGRA_CTRL_A 0x00
     #define CGRA_CTRL_BIT_START_EXEC  0x1
+    #define CGRA_CTRL_BIT_CLEAR       0x2
     #define CGRA_CTRL_BIT_LOAD_CONFIG 0x4
+    #define CGRA_CTRL_BIT_DONE_CONFIG 0x2
+    #define CGRA_CTRL_BIT_DONE_EXEC   0x1
 
 
 #define CGRA_CONF_ADDR_A	0x04

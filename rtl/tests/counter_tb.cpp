@@ -97,8 +97,16 @@ int main(int argc, char** argv, char** env) {
 
     // Copy bitstream to RAM
 
-    uint32_t *cgra_kernel = bypass_kernel;
-    uint32_t cgra_kernel_size = BYPASS_SIZE;
+    // uint32_t *cgra_kernel = bypass_kernel;
+    // uint32_t cgra_kernel_size = BYPASS_SIZE;
+
+    uint32_t *cgra_kernel = dot_product_kernel;
+    uint32_t cgra_kernel_size = DOT_PRODUCT_SIZE;
+
+    // uint32_t *cgra_kernel = relu_kernel;
+    // uint32_t cgra_kernel_size = RELU_KRNL_SIZE;
+
+
 
     for(int i=0; i<cgra_kernel_size; i+=2)
     {
@@ -108,11 +116,12 @@ int main(int argc, char** argv, char** env) {
 
 
     // Setup Input data
-    for(int i = 0; i<100; i++)
+    for(int i = 0; i<2; i++)
     {
-        write_ram(dut, DATA_IN_ADDR + i*8, 0xa0000000b0000000 + 0x0000000100000001*i);
+        write_ram(dut, DATA_IN_ADDR + i*4, i);
     }
-
+    // write_ram(dut, DATA_IN_ADDR + 0x00, 1L << 32 | 2 );
+    // write_ram(dut, DATA_IN_ADDR + 0x08, (uint64_t)(-2) << 32 | 4 );
 
     /////////////// SIMULATION LOOP ////////////////
     dut->rst_ni = 0;
@@ -131,33 +140,78 @@ int main(int argc, char** argv, char** env) {
             write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_LOAD_CONFIG);
         }
 
+        // Start exec
         if(sim_time == 500)
         {
-            write_reg_eval(dut, m_trace, CGRA_IN0_ADDR_A, DATA_IN_ADDR);
-            write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0x4 << 16 | 0x20);
 
-            write_reg_eval(dut, m_trace, CGRA_OUT0_ADDR_A, DATA_OUT_ADDR);
-            write_reg_eval(dut, m_trace, CGRA_OUT0_SIZE_A, 0x20);
+            write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_IN2_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_IN3_SIZE_A, 0);
 
-            write_reg_eval(dut, m_trace, CGRA_IN1_ADDR_A, DATA_IN_ADDR+0x30);
-            write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0x4 << 16 | 0x20);
+            write_reg_eval(dut, m_trace, CGRA_OUT0_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_OUT2_SIZE_A, 0);
+            write_reg_eval(dut, m_trace, CGRA_OUT3_SIZE_A, 0);
 
-            write_reg_eval(dut, m_trace, CGRA_OUT1_ADDR_A, DATA_OUT_ADDR+0x30);
-            write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0x20);
+            // write_reg_eval(dut, m_trace, CGRA_IN0_ADDR_A, DATA_IN_ADDR);
+            // write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0x4 << 16 | 0x4*16);
 
-            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
-        }
+            // write_reg_eval(dut, m_trace, CGRA_IN1_ADDR_A, DATA_IN_ADDR);
+            // write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0x4 << 16 | 0x4*16);
 
-        if(sim_time == 700)
-        {
-            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_LOAD_CONFIG);
-        }
+            // write_reg_eval(dut, m_trace, CGRA_IN2_ADDR_A, DATA_IN_ADDR);
+            // write_reg_eval(dut, m_trace, CGRA_IN2_SIZE_A, 0x4 << 16 | 0x4*16);
 
-        if(sim_time == 1100)
-        {
-            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
-        }
+            // write_reg_eval(dut, m_trace, CGRA_IN3_ADDR_A, DATA_IN_ADDR);
+            // write_reg_eval(dut, m_trace, CGRA_IN3_SIZE_A, 0x4 << 16 | 0x4*16);
+
+
+
+            // write_reg_eval(dut, m_trace, CGRA_OUT1_ADDR_A, DATA_OUT_ADDR);
+            // write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0x4*1);
             
+            // write_reg_eval(dut, m_trace, CGRA_OUT2_ADDR_A, DATA_OUT_ADDR+0x20);
+            // write_reg_eval(dut, m_trace, CGRA_OUT2_SIZE_A, 0x4*1);
+            
+            // write_reg_eval(dut, m_trace, CGRA_OUT3_ADDR_A, DATA_OUT_ADDR+0x40);
+            // write_reg_eval(dut, m_trace, CGRA_OUT3_SIZE_A, 0x4*1);
+
+
+            write_reg_eval(dut, m_trace, CGRA_IN0_ADDR_A, DATA_IN_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0x4 << 16 | 0x4*16);
+
+            write_reg_eval(dut, m_trace, CGRA_IN1_ADDR_A, DATA_IN_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0x4 << 16 | 0x4*16);
+
+            write_reg_eval(dut, m_trace, CGRA_IN2_ADDR_A, DATA_IN_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_IN2_SIZE_A, 0x4 << 16 | 0x4*16);
+
+            write_reg_eval(dut, m_trace, CGRA_IN3_ADDR_A, DATA_IN_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_IN3_SIZE_A, 0x4 << 16 | 0x4*16);
+
+
+
+            write_reg_eval(dut, m_trace, CGRA_OUT1_ADDR_A, DATA_OUT_ADDR);
+            write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0x4*1);
+
+            write_reg_eval(dut, m_trace, CGRA_OUT2_ADDR_A, DATA_OUT_ADDR+0x20);
+            write_reg_eval(dut, m_trace, CGRA_OUT2_SIZE_A, 0x4*1);
+
+            write_reg_eval(dut, m_trace, CGRA_OUT3_ADDR_A, DATA_OUT_ADDR+0x40);
+            write_reg_eval(dut, m_trace, CGRA_OUT3_SIZE_A, 0x4*1);
+
+
+            write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
+        } 
+
+        // // Start exec
+        // if(sim_time == 1100)
+        // {
+
+        //     //write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_CLEAR);
+        //     write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
+        // }
 
     }
 
@@ -171,18 +225,6 @@ int main(int argc, char** argv, char** env) {
 
     printf("\nOUTPUT MEM\n");
     examine_mem(dut, DATA_OUT_ADDR, DATA_OUT_ADDR + 0x50);
-
-    // for(int i=; i<20; i++)
-    // {
-
-    //     uint32_t high = (RAM_CONTENTS[base_addr + i]) >> 32;
-    //     uint32_t low = RAM_CONTENTS[base_addr + i] & 0x00000000ffffffff;
-
-    //     printf("%08x: %08x %08x\n", 8*i, low, high);
-    //     if((i+1)%4 == 0)
-    //         printf("\n");
-    // }
-
 
 
     m_trace->close();
@@ -202,3 +244,34 @@ int main(int argc, char** argv, char** env) {
     //         dut->rst_ni = 1;
 
     // }
+
+
+
+// // Start exec
+        // if(sim_time == 500)
+        // {
+        //     write_reg_eval(dut, m_trace, CGRA_IN0_ADDR_A, DATA_IN_ADDR);
+        //     write_reg_eval(dut, m_trace, CGRA_IN0_SIZE_A, 0x4 << 16 | 40);
+
+        //     write_reg_eval(dut, m_trace, CGRA_IN1_ADDR_A, DATA_IN_ADDR);
+        //     write_reg_eval(dut, m_trace, CGRA_IN1_SIZE_A, 0x4 << 16 | 40);
+
+        //     write_reg_eval(dut, m_trace, CGRA_IN2_ADDR_A, DATA_IN_ADDR);
+        //     write_reg_eval(dut, m_trace, CGRA_IN2_SIZE_A, 0x4 << 16 | 40);
+
+        //     write_reg_eval(dut, m_trace, CGRA_IN3_ADDR_A, DATA_IN_ADDR);
+        //     write_reg_eval(dut, m_trace, CGRA_IN3_SIZE_A, 0x4 << 16 | 40);
+
+
+
+        //     write_reg_eval(dut, m_trace, CGRA_OUT1_ADDR_A, DATA_OUT_ADDR);
+        //     write_reg_eval(dut, m_trace, CGRA_OUT1_SIZE_A, 0x4*3);
+
+        //     write_reg_eval(dut, m_trace, CGRA_OUT2_ADDR_A, DATA_OUT_ADDR+0x100);
+        //     write_reg_eval(dut, m_trace, CGRA_OUT2_SIZE_A, 0x4*3);
+
+        //     write_reg_eval(dut, m_trace, CGRA_OUT3_ADDR_A, DATA_OUT_ADDR+0x200);
+        //     write_reg_eval(dut, m_trace, CGRA_OUT3_SIZE_A, 0x4*3);
+
+        //     write_reg_eval(dut, m_trace, CGRA_CTRL_A, CGRA_CTRL_BIT_START_EXEC);
+        // }  
