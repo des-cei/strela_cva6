@@ -4,10 +4,10 @@
 
 // Input data FIFOs
 //  -----------------<< From memory
-//  |   |   |   |
-// |_| |_| |_| |_|
-//  |___|___|___|  data_input_o
-// |    CGRA     |
+//  |   |   |   |  '---------------.
+// |_| |_| |_| |_|                 |
+//  |___|___|___|  data_input_o    |
+// |    CGRA     |<----------------' config
 // |_____________|
 //  |   |   |   |  data_output_i
 // |_| |_| |_| |_|
@@ -63,9 +63,9 @@ module test_state_machines #(
 );
 
     localparam INPUT_MAX_OUTSTANDING = 10;
-    localparam OUTPUT_MAX_OUTSTANDING = 10;
-    localparam INPUT_FIFO_DEPTH = 20;
-    localparam OUTPUT_FIFO_DEPTH = 20;
+    localparam OUTPUT_MAX_OUTSTANDING = 4;
+    localparam INPUT_FIFO_DEPTH = 9; // Problem with powers of two because fifo_v3's usage overflows to zero when full
+    localparam OUTPUT_FIFO_DEPTH = 9; // See https://github.com/pulp-platform/common_cells/issues/69 ...
 
     localparam CONFIG_INDEX = INPUT_NODES_NUM-1 +1;
 
@@ -126,6 +126,9 @@ module test_state_machines #(
     logic [32:0] data_input_fifo_out [INPUT_NODES_NUM-1:0];
     logic [INPUT_NODES_NUM-1:0] data_input_fifo_pop;
     logic [INPUT_NODES_NUM-1:0] data_input_fifo_empty;
+
+    // Input FIFO pending data counters
+    logic [$clog2(INPUT_FIFO_DEPTH)-1:0] data_input_fifo_pending_count [INPUT_NODES_NUM-1:0];
 
     // Input outstanding FIFO  
     trans_info_t input_outst_fifo_in;   
@@ -203,8 +206,8 @@ module test_state_machines #(
     always_comb begin
         // Request
         for(int i=0; i < INPUT_NODES_NUM; i++) begin
-            data_input_arb_request[i] = (data_input_fifo_count[i] < (INPUT_FIFO_DEPTH - INPUT_MAX_OUTSTANDING)) &&
-                                        data_input_address_under_size[i] && data_input_execute_d;  
+            data_input_arb_request[i] = ((data_input_fifo_count[i] + data_input_fifo_pending_count[i]) < INPUT_FIFO_DEPTH) &&
+                                        data_input_address_under_size[i] && data_input_execute_d; 
         end
 
         data_input_arb_request[CONFIG_INDEX] = data_config_execute_d && data_input_address_under_size[CONFIG_INDEX]; 
@@ -330,6 +333,22 @@ module test_state_machines #(
             .data_o       ( data_input_fifo_out[i]     ),
             .pop_i        ( data_input_fifo_pop[i]     ),
             .empty_o      ( data_input_fifo_empty[i]   ) 
+        );
+    end
+    endgenerate
+
+    // Pending input data counter (i.e., sent read address but not yet received data)
+    // Incremented when a memory request for a FIFO is granted, decremented when data is received and pushed into the FIFO.
+    generate
+    for(genvar i = 0; i < INPUT_NODES_NUM; i++) begin : data_input_fifo_pending_counters
+        up_down_counter #(
+            .WIDTH($clog2(INPUT_FIFO_DEPTH))
+        ) i_up_down_counter (
+            .clk_i(clk_i),
+            .rst_ni(rst_ni),
+            .up_i(data_input_arb_grant_one_hot[i]),
+            .down_i(data_input_fifo_push[i]),
+            .count_o(data_input_fifo_pending_count[i])
         );
     end
     endgenerate
