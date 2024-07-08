@@ -56,6 +56,7 @@ module test_state_machines #(
     input   logic [15:0] data_output_size_i [OUTPUT_NODES_NUM-1:0],
 
     output  logic data_output_done_o,
+    input   logic output_arbiter_hold_i,
 
     // For stall cycle counters
     output  logic input_outst_fifo_full_o,
@@ -305,14 +306,15 @@ module test_state_machines #(
     end
 
 
-    round_robin_arbiter #(
+    round_robin_arbiter_hold #(
         .WIDTH(INPUT_NODES_NUM +1) // MSB is for config
     ) i_data_input_arbiter (
         .clk_i(clk_i),
         .rst_ni(rst_ni),
         .request_i(data_input_arb_request),
         .grant_o(data_input_arb_grant_one_hot),
-        .enable_i(data_input_arb_enable)
+        .enable_i(data_input_arb_enable),
+        .hold_enable_i(1'b0)
     );
 
     // Input data FIFOs
@@ -573,14 +575,15 @@ module test_state_machines #(
     end
 
 
-    round_robin_arbiter #(
+    round_robin_arbiter_hold #(
         .WIDTH(OUTPUT_NODES_NUM)
     ) i_data_output_arbiter (
         .clk_i(clk_i),
         .rst_ni(rst_ni),
         .request_i(data_output_arb_request),
         .grant_o(data_output_arb_grant_one_hot),
-        .enable_i(data_output_arb_enable)
+        .enable_i(data_output_arb_enable),
+        .hold_enable_i(output_arbiter_hold_i)
     );
 
 
@@ -671,6 +674,7 @@ module test_state_machines #(
     //     .probe21(execute_output_i),
     //     .probe22(data_output_execute_q), 
     //     .probe23(data_output_end_cycle_reset), 
+
     //     .probe24(cycle_count_o),
     //     .probe25(data_input_fifo_count[0]),
     //     .probe26(data_input_fifo_count[1]),
@@ -680,28 +684,36 @@ module test_state_machines #(
     //     .probe30(data_output_fifo_count[1]),
     //     .probe31(data_output_fifo_count[2]),
     //     .probe32(data_output_fifo_count[3]), 
+
     //     .probe33(data_input_addr_offs_q[0]), 
     //     .probe34(data_output_addr_offs_q[0]),
+
     //     .probe35(data_input_arb_request),
     //     .probe36(data_input_arb_grant_one_hot),
     //     .probe37(input_outst_fifo_count),
+
     //     .probe38(data_output_arb_request),
     //     .probe39(data_output_arb_grant_one_hot),
     //     .probe40(output_outst_fifo_count),
-    //     .probe41(data_output_address_under_size)
+
+    //     .probe41(data_output_address_under_size),
+    //     .probe42(data_input_address_under_size),
+    //     .probe43(execute_config_i),
+    //     .probe44(data_config_execute_q)
     // );
 
 endmodule
 
 
-module round_robin_arbiter #(
+module round_robin_arbiter_hold #(
     parameter WIDTH = -1
 ) (
     input   logic   clk_i,
     input   logic   rst_ni,
     input   logic   [WIDTH-1:0] request_i,
     output  logic   [WIDTH-1:0] grant_o,
-    input   logic   enable_i
+    input   logic   enable_i,
+    input   logic   hold_enable_i
 );
 
     logic [WIDTH-1:0] rol_prev_grant_d, rol_prev_grant_q;
@@ -731,8 +743,13 @@ module round_robin_arbiter #(
         else
             grant_o = 0;
 
-        if(grant_o != 0) // Rotate left previous grant output
-            rol_prev_grant_d = {grant_o[WIDTH-2:0], grant_o[WIDTH-1]};
+        // Rotate left previous grant output
+        // If hold_enable_i, do not rotate, so the same position is granted again if requested
+        if(grant_o != 0)
+            if(hold_enable_i)
+                rol_prev_grant_d = grant_o;
+            else
+                rol_prev_grant_d = {grant_o[WIDTH-2:0], grant_o[WIDTH-1]};
         else
             rol_prev_grant_d = rol_prev_grant_q;
     end

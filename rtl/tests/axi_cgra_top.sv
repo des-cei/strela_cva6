@@ -109,6 +109,8 @@ module axi_cgra_top #(
 
     logic clear_cgra_config, clear_cgra_state;
 
+    logic output_arbiter_hold;
+
 
     test_csr #(
         .reg_req_t      ( regbus_req_t      ),
@@ -140,7 +142,8 @@ module axi_cgra_top #(
         .clear_cgra_config_o          ( clear_cgra_config ),
         .clear_cgra_state_o           ( clear_cgra_state ),
 
-        .reset_state_machines_o ( reset_state_machines  )
+        .reset_state_machines_o ( reset_state_machines  ),
+        .output_arbiter_hold_o   ( output_arbiter_hold )
     );
 
 
@@ -218,6 +221,7 @@ module axi_cgra_top #(
         .data_output_addr_i  ( data_output_addr ), // '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050}
         .data_output_size_i  ( data_output_size ), // '{16'h04, 16'h04, 16'h04, 16'h04}
         .data_output_done_o  ( done_exec ),
+        .output_arbiter_hold_i  ( output_arbiter_hold ),
 
         // For stall cycle calculation
         .input_outst_fifo_full_o(counters_read_stall),

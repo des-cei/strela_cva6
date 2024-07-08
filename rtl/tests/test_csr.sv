@@ -35,7 +35,9 @@ module test_csr #(
     output logic clear_cgra_state_o,
     
     // Test debug:
-    output logic reset_state_machines_o
+    output logic reset_state_machines_o,
+
+    output logic output_arbiter_hold_o
 
 );
 
@@ -119,6 +121,8 @@ module test_csr #(
             8'h94: reg_read_data = cycle_count_execute_i;
             8'h98: reg_read_data = cycle_count_stall_i;
 
+            8'hA0: reg_read_data = output_arbiter_hold_o;
+
             default: reg_read_data = '0;
         endcase
     end
@@ -138,6 +142,8 @@ module test_csr #(
 
             data_config_addr_o <= 32'h90000000;
             data_config_size_o <= 16'h14;
+
+            output_arbiter_hold_o <= 1'b0;
 
 
         end else begin
@@ -183,7 +189,8 @@ module test_csr #(
                 8'h68: data_output_addr_o[3] <= reg_write_data;
                 8'h6C: data_output_size_o[3] <= reg_write_data;
 
-
+                // Output arbiter config
+                8'hA0: output_arbiter_hold_o <= reg_write_data[0];
 
 
             endcase
