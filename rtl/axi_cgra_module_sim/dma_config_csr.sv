@@ -1,4 +1,6 @@
-module test_csr #(
+// Countrol-Status Registers for DMA Interface configuration
+
+module dma_config_csr #(
     parameter type reg_req_t  = logic,
     parameter type reg_rsp_t  = logic,
     parameter INPUT_NODES_NUM = 4,
@@ -78,7 +80,7 @@ module test_csr #(
     // Register read
     always_comb begin
         case(reg_addr)
-            // Test
+            // Test: Useful for debugging
             8'hF0: reg_read_data = op_a;
             8'hF4: reg_read_data = op_b;
             8'hF8: reg_read_data = op_a + op_b;
@@ -133,15 +135,15 @@ module test_csr #(
             op_a <= '0;
             op_b <= '0;
 
-            data_input_addr_o <= '{32'h8300000C,32'h82000008,32'h81000004,32'h80000000};
-            data_input_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
-            data_input_stride_o <= '{16'h0, 16'h0, 16'h0, 16'h4};
+            data_input_addr_o <= '{32'h0,32'h0,32'h0,32'h0};
+            data_input_size_o <= '{16'h0, 16'h0, 16'h0, 16'h0};
+            data_input_stride_o <= '{16'h0, 16'h0, 16'h0, 16'h0};
 
-            data_output_addr_o <= '{32'h9300005C,32'h92000058,32'h91000054,32'h90000100};
-            data_output_size_o <= '{16'h0, 16'h0, 16'h0, 16'd80};
+            data_output_addr_o <= '{32'h0,32'h0,32'h0,32'h0};
+            data_output_size_o <= '{16'h0, 16'h0, 16'h0, 16'h0};
 
-            data_config_addr_o <= 32'h90000000;
-            data_config_size_o <= 16'h14;
+            data_config_addr_o <= 32'h0;
+            data_config_size_o <= 16'h0;
 
             output_arbiter_hold_o <= 1'b0;
 
@@ -153,6 +155,7 @@ module test_csr #(
                 // Test
                 8'hF0: op_a <= reg_write_data;
                 8'hF4: op_b <= reg_write_data;
+
                 8'hF8: reset_state_machines_o <= reg_write_data;
 
                 // Control/status

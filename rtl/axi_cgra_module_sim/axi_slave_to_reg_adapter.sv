@@ -1,4 +1,4 @@
-
+// An adapter between an AXI Slave and Register Interface
 
 module axi_slave_to_reg_adapter #(
     parameter int unsigned AXI_ID_WIDTH_MASTER  = -1,

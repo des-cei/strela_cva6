@@ -1,3 +1,7 @@
+// Control Unit and Performance Counters
+// Directs signals from CSRs to command
+// DMA interface and CGRA operation
+
 module countrol_unit (
     // Clock and reset
     input  logic    clk_i,

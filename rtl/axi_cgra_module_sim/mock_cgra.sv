@@ -1,3 +1,6 @@
+// A module to stand-in for the CGRA during development
+// Inputs are directly connected to outputs
+
 module mock_CGRA # (
     parameter int DATA_WIDTH = 32
 ) (

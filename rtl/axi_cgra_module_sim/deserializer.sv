@@ -3,6 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0 WITH SHL-2.1
 // Daniel Vazquez (daniel.vazquez@upm.es)
 
+// Note: Used as a configuration word destination register. Once a full
+// word is loaded into this shift register, it can be loaded in one of
+// the CGRA's PEs.
+
 module deserializer
 (
   // Clock and reset

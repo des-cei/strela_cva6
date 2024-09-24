@@ -1,3 +1,9 @@
+# Makefile for stand-alone simulation of the AXI CGRA Module
+# Juan Granja, 2024
+
+# Example: Running "make waves" will call Verilator with the SV sources, generate
+# an executable model, run it, and launch GTKWave with the logic traces.
+
 export VERILATOR_ROOT= /home/juangranja/Documents/verilator-5.020
 
 VERILATOR= $(VERILATOR_ROOT)/bin/verilator
@@ -6,8 +12,6 @@ VERILATOR= $(VERILATOR_ROOT)/bin/verilator
 verilate: .stamp.verilate
 sim: waveform.vcd
 
-# For sv testbench
-#TOP_MODULE = test_tb
 TOP_MODULE = sim_top
 
 axi_src_dir = rtl/vendor/pulp-platform/axi/src
@@ -29,26 +33,23 @@ verilator_src_pkgs +=	rtl/strela/rtl/include/cgra_pkg.sv
 
 
 ############# My sources ##############
-verilator_srcs =  rtl/tests/sim_top.sv
+verilator_srcs =  rtl/axi_cgra_module_sim/sim_top.sv
 
-verilator_srcs += rtl/tests/test_ram_64.sv
+verilator_srcs += rtl/axi_cgra_module_sim/test_ram_64.sv
 
-verilator_srcs += rtl/tests/axi_cgra_top.sv
-verilator_srcs += rtl/tests/test_csr.sv
-verilator_srcs += rtl/tests/test_state_machines.sv
-verilator_srcs += rtl/tests/deserializer.sv
-verilator_srcs += rtl/tests/control_unit.sv
-verilator_srcs += rtl/tests/axi_slave_to_reg_adapter.sv
+verilator_srcs += rtl/axi_cgra_module_sim/axi_cgra_top.sv
+verilator_srcs += rtl/axi_cgra_module_sim/dma_config_csr.sv
+verilator_srcs += rtl/axi_cgra_module_sim/dma_interface.sv
+verilator_srcs += rtl/axi_cgra_module_sim/deserializer.sv
+verilator_srcs += rtl/axi_cgra_module_sim/control_unit.sv
+verilator_srcs += rtl/axi_cgra_module_sim/axi_slave_to_reg_adapter.sv
 
 
-verilator_srcs += rtl/tests/mock_cgra.sv
+verilator_srcs += rtl/axi_cgra_module_sim/mock_cgra.sv
 
 
 ############# Strela CGRA sources #############
 verilator_srcs += 	$(wildcard rtl/strela/rtl/cgra/*.sv)
-# verilator_srcs +=	rtl/strela/sim/cgra_clock_gate.sv
-
-
 
 
 ############# Vendor sources ###########
@@ -94,10 +95,12 @@ verilator_srcs += 	$(axi_src_dir)/axi_intf.sv									\
 					$(axi_src_dir)/axi_xbar.sv									\
 					$(axi_src_dir)/axi_lite_to_axi.sv	
 
+# Note: A useful command for managing sources (example):
+# $(filter-out %_pkg.sv, $(wildcard rtl/vendor/pulp-platform/common_cells/src/*.sv))
 
 
 ############# Verilate command #############
-verilator_cpp_testbench = rtl/tests/counter_tb.cpp
+verilator_cpp_testbench = rtl/axi_cgra_module_sim/cpp_testbench.cpp
 
 verilate_command = 	$(VERILATOR) --no-timing --assert
 verilate_command +=	-Wall --trace -cc
@@ -126,11 +129,11 @@ verilate_command +=	-Werror-PINMISSING      \
 
 .stamp.verilate: $(verilator_srcs) $(verilator_cpp_testbench)
 	@echo "### VERILATING ###"
-# $(verilate_command) --binary -j $(shell nproc)
-# $(verilate_command) --build -j $(shell nproc)
-	$(verilate_command) -j $(shell nproc)
-# -CFLAGS '-DVL_DEBUG -ggdb'
 
+	$(verilate_command) -j $(shell nproc)
+
+# Useful for debugging:
+# -CFLAGS '-DVL_DEBUG -ggdb'
 # -CFLAGS '-DVL_DEBUG -ggdb' --debug --gdbbt
 
 	@echo "### BUILDING ###"
@@ -165,6 +168,3 @@ clean:
 
 
 
-# $(filter-out %_pkg.sv, $(wildcard rtl/vendor/pulp-platform/common_cells/src/*.sv)) \
-# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv                  \
-# 					rtl/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv

@@ -1,4 +1,4 @@
-// An AXI-Lite master
+// A DMA interface to manage data transfer to and from the CGRA as an AXI-Lite master
 // Reads data from memory and stores it in FIFOs, where the CGRA reads from.
 // Receives data from CGRA, stores in further FIFOs and from there to memory.
 
@@ -6,10 +6,10 @@
 //  -----------------<< From memory
 //  |   |   |   |  '---------------.
 // |_| |_| |_| |_|                 |
-//  |___|___|___|  data_input_o    |
+//  |___|___|___|--data_input_o    |
 // |    CGRA     |<----------------' config
 // |_____________|
-//  |   |   |   |  data_output_i
+//  |   |   |   |--data_output_i
 // |_| |_| |_| |_|
 //  |   |   |   |
 //  ----------------->> To memory
@@ -17,7 +17,7 @@
 
 // See axi_mem_if/src/axi2mem.sv for example use of AXI_BUS interface (as a slave that is)
 
-module test_state_machines #(
+module dma_interface #(
     parameter int unsigned INPUT_NODES_NUM = 4,
     parameter int unsigned OUTPUT_NODES_NUM = 4
 ) (

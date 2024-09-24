@@ -1,3 +1,14 @@
+// Top file of the simulation
+
+// Includes:
+// - Module for CGRA integration
+// - Simulated RAM memory
+// - PULP AXI crossbar, the same used with CVA6
+
+// Note: For initial testing, some stimuly was generated in this testbench.
+// Note that Verilator lacks some functionality regarding SystemVerilog testbenches.
+
+
 module sim_top(
     input       logic       clk_i,
     input       logic       rst_ni,

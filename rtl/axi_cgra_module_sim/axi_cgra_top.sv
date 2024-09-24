@@ -1,3 +1,14 @@
+// Module for CGRA integration in the target platform
+//
+// Interfaces:
+// - AXI Master port for DMA, AXI Slave port for configuration
+// - Clock and Reset
+//
+// Includes:
+// - Strela CGRA
+// - Custom DMA Interface
+// - Control-Status Registers
+// - Miscelaneous protocol adapters
 
 `include "register_interface/assign.svh"
 `include "register_interface/typedef.svh"
@@ -19,39 +30,6 @@ module axi_cgra_top #(
     localparam INPUT_NODES_NUM = 4;
     localparam OUTPUT_NODES_NUM = 4;
 
-    // logic test_cgra_execute_input;
-    // logic test_cgra_execute_output;
-
-    // // For simulation only
-    // logic [31:0] count_q;
-    // always_ff @(posedge clk_i) begin
-    //     if(!rst_ni)
-    //         count_q <= '0;
-
-    //     // Default
-    //     count_q <= count_q + 1;
-
-    //     case(count_q)
-    //         0:  begin
-    //             test_cgra_execute_input <= 0;
-    //             test_cgra_execute_output <= 0;
-    //         end
-
-    //         10: begin
-    //             test_cgra_execute_input <= 1;
-    //             test_cgra_execute_output <= 1;
-    //         end
-    //         11: begin
-    //             test_cgra_execute_input <= 0;
-    //             test_cgra_execute_output <= 0;
-    //         end
-
-    //         // 12: test_cgra_execute_output <= 1;
-    //         // 13: test_cgra_execute_output <= 0;
-            
-    //     endcase
-    // end
-
     // define types regbus_req_t, regbus_rsp_t
     `REG_BUS_TYPEDEF_ALL(regbus, logic[31:0], logic[31:0], logic[3:0])
     regbus_req_t regbus_req;
@@ -61,8 +39,6 @@ module axi_cgra_top #(
     .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH        ),
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH        )
     ) axi_lite_bus();
-
-
 
 
     axi_slave_to_reg_adapter #(
@@ -112,10 +88,10 @@ module axi_cgra_top #(
     logic output_arbiter_hold;
 
 
-    test_csr #(
+    dma_config_csr #(
         .reg_req_t      ( regbus_req_t      ),
         .reg_rsp_t      ( regbus_rsp_t      )
-    ) i_test_reg_interface (
+    ) i_dma_config_csr (
         .clk_i          ( clk_i             ),
         .rst_ni         ( rst_ni            ),
         .reg_req_i      ( regbus_req        ),
@@ -190,7 +166,7 @@ module axi_cgra_top #(
 
     logic [159:0] configuration_word;
 
-    test_state_machines i_test_state_machines (
+    dma_interface i_dma_interface (
         .clk_i  (clk_i),
         .rst_ni ( !(!rst_ni | reset_state_machines) ),
         .axi_master_port (axi_lite_bus),
@@ -204,9 +180,9 @@ module axi_cgra_top #(
         .data_input_o        ( cgra_data_input_data ),
         .data_input_valid_o  ( cgra_data_input_valid ),
         .data_input_ready_i  ( cgra_data_input_ready ),
-        .data_input_addr_i   ( data_input_addr ), // '{32'h8300000C,32'h82000008,32'h81000004,32'h80000000}
-        .data_input_size_i   ( data_input_size ), // '{16'h8, 16'h8, 16'h8, 16'h8}
-        .data_input_stride_i ( data_input_stride ), // '{16'h8, 16'h8, 16'h8, 16'h8}
+        .data_input_addr_i   ( data_input_addr ),
+        .data_input_size_i   ( data_input_size ),
+        .data_input_stride_i ( data_input_stride ),
 
         // CGRA config data signals
         .configuration_word_o( configuration_word ),
@@ -218,8 +194,8 @@ module axi_cgra_top #(
         .data_output_i       ( cgra_data_output_data ),
         .data_output_valid_i ( cgra_data_output_valid ),
         .data_output_ready_o ( cgra_data_output_ready ),
-        .data_output_addr_i  ( data_output_addr ), // '{32'h9300005C,32'h92000058,32'h91000054,32'h90000050}
-        .data_output_size_i  ( data_output_size ), // '{16'h04, 16'h04, 16'h04, 16'h04}
+        .data_output_addr_i  ( data_output_addr ),
+        .data_output_size_i  ( data_output_size ),
         .data_output_done_o  ( done_exec ),
         .output_arbiter_hold_i  ( output_arbiter_hold ),
 

@@ -1,3 +1,5 @@
+// CGRA configuration kernels for a series of tasks
+
 #include <stdint.h>
 
 #define BYPASS_NPE 16

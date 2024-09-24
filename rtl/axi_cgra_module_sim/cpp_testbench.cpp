@@ -1,3 +1,9 @@
+// CPP Testbench for the simulation of the sim_top module
+
+// Generates clock and reset signals and dumps waveforms
+// Contains functions for reading and writing in the simulated
+// RAM memory, as well as accessing CSRs.
+
 #include <stdlib.h>
 #include <iostream>
 #include <verilated.h>
@@ -11,7 +17,7 @@
 
 // To access registers
 #include "Vsim_top_axi_cgra_top__pi1.h"
-#include "Vsim_top_test_csr__Tz17_TBz18.h"
+#include "Vsim_top_dma_config_csr__Tz17_TBz18.h"
 
 // Register addresses
 #include "register_addresses.h"
@@ -24,25 +30,25 @@ vluint64_t sim_time = 0;
 // To be called before rising edge of the clock
 void write_reg(Vsim_top *dut, uint32_t reg_addr, uint32_t reg_data)
 {
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_addr = reg_addr;
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_write_data = reg_data;
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_we = 1;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_addr = reg_addr;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_write_data = reg_data;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_we = 1;
 }
 
 void write_reg_eval(Vsim_top *dut, VerilatedVcdC *m_trace, uint32_t reg_addr, uint32_t reg_data)
 {
     dut->clk_i = 0;  dut->eval();  m_trace->dump(sim_time++);
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_addr = reg_addr;
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_write_data = reg_data;
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_we = 1;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_addr = reg_addr;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_write_data = reg_data;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_we = 1;
     dut->clk_i = 1;  dut->eval();  m_trace->dump(sim_time++);
 }
 
 uint32_t read_reg(Vsim_top *dut, uint32_t reg_addr)
 {
-    dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_addr = reg_addr;
+    dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_addr = reg_addr;
     dut->eval();
-    return dut->sim_top->i_axi_cgra_top->i_test_reg_interface->reg_read_data;
+    return dut->sim_top->i_axi_cgra_top->i_dma_config_csr->reg_read_data;
 }
 
 
@@ -221,6 +227,7 @@ int main(int argc, char** argv, char** env) {
     }
 
 
+    printf("\nMemory dump\n");
 
     printf("\nCONFIG MEM\n");
     examine_mem(dut, CONFIG_ADDR, CONFIG_ADDR + 0x50);

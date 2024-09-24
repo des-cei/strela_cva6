@@ -1,4 +1,4 @@
-
+// CSR addresses for use by a C program
 
 #define CGRA_CTRL_A 0x00
     #define CGRA_CTRL_BIT_START_EXEC  0x1
